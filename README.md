@@ -1,1 +1,5 @@
-# This is my README
+Compilador 2013-14 - FEUP
+
+ASSIGNMENT: EBNF
+
+3MIEIC02 - Group 5
