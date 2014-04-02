@@ -1,0 +1,104 @@
+PARSER_BEGIN(Ebnf)
+// código Java que invoca o parser
+public class Ebnf {
+	public static void main(String args[]) throws ParseException {
+		// criação do objecto utilizando o constructor com argumento para
+		// ler do standard input (teclado)
+		Ebnf parser = new Ebnf(System.in);
+		parser.Test();
+	}
+}
+PARSER_END(Ebnf)
+// símbolos que não devem ser considerados na análise
+SKIP :
+{
+	" " | "\t" | "\r"
+}
+// definição dos tokens (símbolos terminais)
+TOKEN :
+{
+	< LETTER : ["A" - "Z"] >
+	|
+	< CM : "," >
+	|
+	< DIGIT : ["0" - "9"] >
+	|							//SYMBOLS
+	< OPEN1 : "(" >
+	|
+	< CLOSE1 : ")" >
+	|
+	< OPEN2 : "[" >
+	|
+	< CLOSE2 : "]" >
+	|
+	< OPEN3: "{" >
+	|
+	< CLOSE3 : "}" >
+	|
+	< DOT : "." >
+	|
+	< OR : "|" >
+	|
+	< SEMICOLON : ";" >
+	|
+	< EQUALS : "=" >
+	|
+	< Q_MARK : "\"" >
+	|
+	< S_QUOTE : "\'" >
+	|
+	< LESS_THAN : "<" >
+	|
+	< GREATER_THAN : ">" >
+	|
+	< SYMBOL : <OPEN1> | <OPEN2> | <OPEN3> | <CLOSE1> | <CLOSE2> | <CLOSE3> | <GREATER_THAN> | <LESS_THAN> | <S_QUOTE> | <Q_MARK> | <EQUALS> | <OR> | <DOT> | <CM> | <SEMICOLON> >
+	|
+	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | "_" >
+	|
+	< IDENTIFIER : <LETTER> <CM> (<LETTER> | <DIGIT> | "_")* >
+	| 
+	< TERMINAL : (<S_QUOTE> <CM> <CARACTER> <CM> (<CARACTER>)* <CM> <S_QUOTE>) | (<Q_MARK> <CM> <CARACTER> <CM> (<CARACTER>)* <CM> <Q_MARK>) >
+	|
+	< LHS : <IDENTIFIER> >
+
+	/*
+	|
+	< RHS : (<RHS1> <CM> "|" <CM> <RHS>)
+			| (<RHS1> <CM> "," <CM> <RHS>) >
+	|
+	< RHS1 : <IDENTIFIER>
+			| <TERMINAL>
+			| ("[" <CM> <RHS> <CM> "]")
+			| ("{" <CM> <RHS> <CM> "}") >
+	|
+	< RULE : <LHS> <CM> "=" <CM> <RHS> <CM> ";" >
+	//|
+	//< GRAMMAR : (<RULE>)* > */
+
+}
+	
+//definição da produção
+
+void Rhs() : {}
+{
+	Rhs1() | (Rhs1() <OR> Rhs()) | (Rhs1() <CM> Rhs())
+}
+
+void Rhs1() : {}
+{
+	<IDENTIFIER>
+	| <TERMINAL>
+	| (<OPEN1> Rhs() <CLOSE1>)
+	| (<OPEN2> Rhs() <CLOSE2>)
+	| (<OPEN3> Rhs() <CLOSE3>)
+}
+
+void Rule() : {}
+{
+	<LHS> <EQUALS> Rhs() <SEMICOLON>
+}
+
+void Test() : {/*Token t1, t2, t3;*/}
+{
+	(Rule())* //(<RULE>)*
+}
