@@ -1,3 +1,6 @@
+//http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form
+
+
 PARSER_BEGIN(Ebnf)
 // código Java que invoca o parser
 public class Ebnf {
@@ -17,6 +20,8 @@ SKIP :
 // definição dos tokens (símbolos terminais)
 TOKEN :
 {
+	< ALL : [0-127] > //?
+	|
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
 	|
 	< CM : "," >
@@ -58,7 +63,10 @@ TOKEN :
 	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")* >
 	| 
 	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
-	//|
+	|
+	< START_COMMENT : <OPEN1> "*" >
+	|
+	< END_COMMENT : "*" <CLOSE1> >
 	//< LHS : <IDENTIFIER> >
 
 
@@ -85,6 +93,18 @@ void Rule() : {}
 {
 	<IDENTIFIER> <EQUALS> Rhs() <SEMICOLON>
 }
+
+void Comment() : {}
+{
+	<START_COMMENT> (ALL)* <END_COMMENT>
+}
+
+/*
+void SpecialSequence() : {}
+{
+	"?" ... "?"
+}
+*/
 
 void Test() : {/*Token t1, t2, t3;*/}
 {
