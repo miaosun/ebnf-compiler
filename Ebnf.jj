@@ -22,21 +22,21 @@ TOKEN :
 {
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
 	|
-	< CM : "," >
+	< COMMA : "," >
 	|
 	< DIGIT : ["0" - "9"] >
 	|							//SYMBOLS
-	< OPEN1 : "(" >
+	< LPAREN : "(" >
 	|
-	< CLOSE1 : ")" >
+	< RPAREN : ")" >
 	|
-	< OPEN2 : "[" >
+	< LBRACKET : "[" >
 	|
-	< CLOSE2 : "]" >
+	< RBRACKET : "]" >
 	|
-	< OPEN3: "{" >
+	< LBRACE: "{" >
 	|
-	< CLOSE3 : "}" >
+	< RBRACE : "}" >
 	|
 	< DOT : "." >
 	|
@@ -54,7 +54,7 @@ TOKEN :
 	|
 	< GREATER_THAN : ">" >
 	|
-	< SYMBOL : <OPEN1> | <OPEN2> | <OPEN3> | <CLOSE1> | <CLOSE2> | <CLOSE3> | <GREATER_THAN> | <LESS_THAN> | <S_QUOTE> | <Q_MARK> | <EQUALS> | <OR> | <DOT> | <CM> | <SEMICOLON> >
+	< SYMBOL : <LPAREN> | <LBRACKET> | <LBRACE> | <RPAREN> | <RBRACKET> | <RBRACE> | <GREATER_THAN> | <LESS_THAN> | <S_QUOTE> | <Q_MARK> | <EQUALS> | <OR> | <DOT> | <COMMA> | <SEMICOLON> >
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | "_" >
 	|
@@ -66,7 +66,9 @@ TOKEN :
 	//< END_COMMENT : "*" <CLOSE1> >
 	< COMMENT : "(*" (~["*"])* "*" ("*" | ~["*",")"] (~["*"])* "*")* ")" >
 	|
-	< ALL : ~[] > //?
+	//< ALL : ~[] > //?
+	//|
+	< SPECIAL_SEQUENCE : "?" (~["?"])* "?" >
 
 	//< LHS : <IDENTIFIER> >
 }
@@ -76,16 +78,16 @@ TOKEN :
 void Rhs() : {}
 {
 	//Rhs1() | (Rhs1() <OR> Rhs()) | (Rhs1() <CM> Rhs())
-	Rhs1() ( (<OR> | <CM>) Rhs())?
+	Rhs1() ( (<OR> | <COMMA>) Rhs())?
 }
 
 void Rhs1() : {}
 {
 	<IDENTIFIER>
 	| <TERMINAL>
-	| (<OPEN1> Rhs() <CLOSE1>)
-	| (<OPEN2> Rhs() <CLOSE2>)
-	| (<OPEN3> Rhs() <CLOSE3>)
+	| (<LPAREN> Rhs() <RPAREN>)
+	| (<LBRACKET> Rhs() <RBRACKET>)
+	| (<LBRACE> Rhs() <RBRACE>)
 }
 
 void Rule() : {}
@@ -93,14 +95,14 @@ void Rule() : {}
 	<IDENTIFIER> <EQUALS> Rhs() <SEMICOLON>
 }
 
-
+/*
 void SpecialSequence() : {}
 {
 	"?" (~["?"])* "?"
 }
-
+*/
 
 void Test() : {/*Token t1, t2, t3;*/}
 {
-	(Rule() | <COMMENT> | SpecialSequence())+
+	(Rule() | <COMMENT> | <SPECIAL_SEQUENCE>)+
 }
