@@ -15,13 +15,11 @@ PARSER_END(Ebnf)
 // símbolos que não devem ser considerados na análise
 SKIP :
 {
-	" " | "\t" | "\r"
+	" " | "\t" | "\r" | "\n"
 }
 // definição dos tokens (símbolos terminais)
 TOKEN :
 {
-	< ALL : [0-127] > //?
-	|
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
 	|
 	< CM : "," >
@@ -60,16 +58,17 @@ TOKEN :
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | "_" >
 	|
-	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")* >
+	< IDENTIFIER : (<LETTER> (<LETTER> | <DIGIT> | "_")* )+ >
 	| 
 	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
 	|
-	< START_COMMENT : <OPEN1> "*" >
+	//< START_COMMENT : <OPEN1> "*" >
+	//< END_COMMENT : "*" <CLOSE1> >
+	< COMMENT : "(*" (~["*"])* "*" ("*" | ~["*",")"] (~["*"])* "*")* ")" >
 	|
-	< END_COMMENT : "*" <CLOSE1> >
+	< ALL : ~[] > //?
+
 	//< LHS : <IDENTIFIER> >
-
-
 }
 	
 //definição da produção
@@ -94,19 +93,14 @@ void Rule() : {}
 	<IDENTIFIER> <EQUALS> Rhs() <SEMICOLON>
 }
 
-void Comment() : {}
-{
-	<START_COMMENT> (ALL)* <END_COMMENT>
-}
 
-/*
 void SpecialSequence() : {}
 {
-	"?" ... "?"
+	"?" (~["?"])* "?"
 }
-*/
+
 
 void Test() : {/*Token t1, t2, t3;*/}
 {
-	(Rule())+
+	(Rule() | <COMMENT> | SpecialSequence())+
 }
