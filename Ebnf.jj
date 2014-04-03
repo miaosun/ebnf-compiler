@@ -17,7 +17,7 @@ SKIP :
 // definição dos tokens (símbolos terminais)
 TOKEN :
 {
-	< LETTER : ["A" - "Z"] >
+	< LETTER : ["A"-"Z"] | ["a"-"z"] >
 	|
 	< CM : "," >
 	|
@@ -55,25 +55,12 @@ TOKEN :
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | "_" >
 	|
-	< IDENTIFIER : <LETTER> <CM> (<LETTER> | <DIGIT> | "_")* >
+	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")* >
 	| 
-	< TERMINAL : (<S_QUOTE> <CM> <CARACTER> <CM> (<CARACTER>)* <CM> <S_QUOTE>) | (<Q_MARK> <CM> <CARACTER> <CM> (<CARACTER>)* <CM> <Q_MARK>) >
-	|
-	< LHS : <IDENTIFIER> >
-
-	/*
-	|
-	< RHS : (<RHS1> <CM> "|" <CM> <RHS>)
-			| (<RHS1> <CM> "," <CM> <RHS>) >
-	|
-	< RHS1 : <IDENTIFIER>
-			| <TERMINAL>
-			| ("[" <CM> <RHS> <CM> "]")
-			| ("{" <CM> <RHS> <CM> "}") >
-	|
-	< RULE : <LHS> <CM> "=" <CM> <RHS> <CM> ";" >
+	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
 	//|
-	//< GRAMMAR : (<RULE>)* > */
+	//< LHS : <IDENTIFIER> >
+
 
 }
 	
@@ -96,10 +83,10 @@ void Rhs1() : {}
 
 void Rule() : {}
 {
-	<LHS> <EQUALS> Rhs() <SEMICOLON>
+	<IDENTIFIER> <EQUALS> Rhs() <SEMICOLON>
 }
 
 void Test() : {/*Token t1, t2, t3;*/}
 {
-	(Rule())*
+	(Rule())+
 }
