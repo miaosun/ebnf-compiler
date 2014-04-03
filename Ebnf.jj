@@ -81,7 +81,8 @@ TOKEN :
 
 void Rhs() : {}
 {
-	Rhs1() | (Rhs1() <OR> Rhs()) | (Rhs1() <CM> Rhs())
+	//Rhs1() | (Rhs1() <OR> Rhs()) | (Rhs1() <CM> Rhs())
+	Rhs1() ( (<OR> | <CM>) Rhs())?
 }
 
 void Rhs1() : {}
@@ -100,5 +101,5 @@ void Rule() : {}
 
 void Test() : {/*Token t1, t2, t3;*/}
 {
-	(Rule())* //(<RULE>)*
+	(Rule())*
 }
