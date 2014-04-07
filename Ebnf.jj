@@ -34,7 +34,7 @@ TOKEN :
 	|
 	< RBRACKET : "]" >
 	|
-	< LBRACE: "{" >
+	< LBRACE : "{" >
 	|
 	< RBRACE : "}" >
 	|
@@ -58,7 +58,7 @@ TOKEN :
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | "_" >
 	|
-	< IDENTIFIER : (<LETTER> (<LETTER> | <DIGIT> | "_")* )+ >
+	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | "_")* >
 	| 
 	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
 	|
@@ -92,7 +92,7 @@ void Rhs1() : {}
 
 void Rule() : {}
 {
-	<IDENTIFIER> <EQUALS> Rhs() <SEMICOLON>
+	(<IDENTIFIER>)+ <EQUALS> Rhs() <SEMICOLON>
 }
 
 /*
