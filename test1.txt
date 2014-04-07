@@ -1,4 +1,4 @@
-(* a simple program syntax in EBNF − Wikipedia *)
+(* a simple program syntax in EBNF - Wikipedia *)
 program = 'PROGRAM', white space, identifier, white space, 
            'BEGIN', white space, 
            { assignment, ";", white space }, 

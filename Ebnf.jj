@@ -96,13 +96,13 @@ TOKEN :
 	< SYMBOL : <LPAREN> | <LBRACKET> | <LBRACE> | <RPAREN> | <RBRACKET> | <RBRACE> | <GREATER_THAN> | <LESS_THAN> 
 			| <S_QUOTE> | <Q_MARK> | <EQUALS> | <OR> | <DOT> | <COMMA> | <SEMICOLON> | <EXCEPTION> | ":" >
 	|
-	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | " " | "_" > 
+	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | " " | "_" >
 	|
 	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | " " | "_")* >
 	| 
 	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
 	|
-	< COMMENT : "(*" (~["*"])* "*" ("*" | ~["*",")"] (~["*"])* "*")* ")" >
+	< COMMENT : <LPAREN> "*" (~["*"])* "*" ("*" | ~["*","("] (~["*"])* "*")* ")">
 	|
 	< SPECIAL_SEQUENCE : "?" (~["?"])* "?" >
 	//< ALL : ~[] > //?
