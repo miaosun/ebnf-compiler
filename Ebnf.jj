@@ -102,7 +102,7 @@ TOKEN :
 	| 
 	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
 	|
-	< COMMENT : <LPAREN> "*" (~["*"])* "*" <RPAREN>  >
+	< COMMENT : "(*" (~["*"])* "*" ("*" | ~["*",")"] (~["*"])* "*")* ")" >
 	|
 	< SPECIAL_SEQUENCE : "?" (~["?"])* "?" >
 	//< ALL : ~[] > //?
