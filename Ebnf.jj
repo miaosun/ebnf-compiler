@@ -53,16 +53,21 @@ PARSER_END(Ebnf)
 SKIP :
 {
 	" " | "\t" | "\r" | "\n"
+	//| < "//" (~["\n","\r"])* ("\n" | "\r" | "\r\n") > 
 }
 // definição dos tokens (símbolos terminais)
 TOKEN :
 {
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
 	|
+	< DIGIT : ["0" - "9"] >
+	|
 	< COMMA : "," >
 	|
-	< DIGIT : ["0" - "9"] >
-	|							//SYMBOLS
+	< EQUALS : "=" >
+	|
+	< OR : "|" >
+	|
 	< LPAREN : "(" >
 	|
 	< RPAREN : ")" >
@@ -75,28 +80,20 @@ TOKEN :
 	|
 	< RBRACE : "}" >
 	|
-	< DOT : "." >
-	|
-	< OR : "|" >
-	|
 	< SEMICOLON : ";" >
-	|
-	< EQUALS : "=" >
 	|
 	< Q_MARK : "\"" >
 	|
 	< S_QUOTE : "\'" >
 	|
-	< LESS_THAN : "<" >
-	|
-	< GREATER_THAN : ">" >
-	|
 	< EXCEPTION : "-" >
 	|
-	< SYMBOL : <LPAREN> | <LBRACKET> | <LBRACE> | <RPAREN> | <RBRACKET> | <RBRACE> | <GREATER_THAN> | <LESS_THAN> 
-			| <S_QUOTE> | <Q_MARK> | <EQUALS> | <OR> | <DOT> | <COMMA> | <SEMICOLON> | <EXCEPTION> | ":" >
+	< ASTERIX : "*">
 	|
-	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> | " " | "_" >
+	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
+	 <EXCEPTION> | <ASTERIX> | " " | "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
+	|
+	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
 	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | " " | "_")* >
 	| 
@@ -124,7 +121,7 @@ void Lhs() : {}
 
 void Rhs() : {}
 {
-	Rhs1() ( (<OR> | <COMMA>) Rhs())?	// esta linha provoca erro no pascalEbnf.txt - linha 9. a remoção da recursividade á esquerda não está bem feita. Pelo menos para todos os casos como por exemplo um ":=" depois de uma rule
+	Rhs1() ((<OR> | <COMMA>) Rhs())?
 }
 
 void Rhs1() : {}
