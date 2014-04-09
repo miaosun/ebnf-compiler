@@ -1,0 +1,152 @@
+//http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form
+
+
+PARSER_BEGIN(Ebnf)
+// Código Java que invoca o parser
+public class Ebnf {
+	public static void main(String args[]) throws ParseException {
+
+		// Iniciando parser
+		Ebnf parser;
+
+		// Ler de do STD
+		if(args.length == 0){
+		System.out.println ("\nParser: Reading input ...");
+		parser = new Ebnf(System.in);
+		}
+		// Ler de um ficheiro
+		else if(args.length == 1){
+			System.out.println ("\nParser: Reading the file " + args[0] + " ..." );
+			try {
+				parser = new Ebnf(new java.io.FileInputStream(args[0]));
+			}
+			catch(java.io.FileNotFoundException e) {
+				System.out.println ("\nParser: The file " + args[0] + " was not found.");
+				return;
+			}
+		}
+		else {
+			System.out.println ("Parser:  You must use one of the following:");
+			System.out.println ("         java Parser < file");
+			System.out.println ("Or");
+			System.out.println ("         java Parser file");
+			return ;
+		}
+		try {
+			SimpleNode root = parser.Start();
+			root.dump("");
+			System.out.println ("\nParser: The input was readed sucessfully.");
+
+		}
+		catch(ParseException e){
+			System.out.println ("\nParser: There was an error during the parse.");
+			System.out.println (e.getMessage());
+		}
+		catch(TokenMgrError e){
+			System.out.println ("\nParser: There was an error.");
+			System.out.println (e.getMessage());
+		}
+
+	}
+}
+PARSER_END(Ebnf)
+
+// símbolos que não devem ser considerados na análise
+SKIP :
+{
+	" " | "\t" | "\r" | "\n"
+	//| < "//" (~["\n","\r"])* ("\n" | "\r" | "\r\n") > 
+}
+// definição dos tokens (símbolos terminais)
+TOKEN :
+{
+	< LETTER : ["A"-"Z"] | ["a"-"z"] >
+	|
+	< DIGIT : ["0" - "9"] >
+	|
+	< COMMA : "," >
+	|
+	< EQUALS : "=" >
+	|
+	< OR : "|" >
+	|
+	< LPAREN : "(" >
+	|
+	< RPAREN : ")" >
+	|
+	< LBRACKET : "[" >
+	|
+	< RBRACKET : "]" >
+	|
+	< LBRACE : "{" >
+	|
+	< RBRACE : "}" >
+	|
+	< SEMICOLON : ";" >
+	|
+	< Q_MARK : "\"" >
+	|
+	< S_QUOTE : "\'" >
+	|
+	< EXCEPTION : "-" >
+	|
+	< ASTERIX : "*">
+	|
+	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
+	 <EXCEPTION> | <ASTERIX> | " " | "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
+	|
+	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
+	|
+	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | " " | "_")* >
+	| 
+	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
+	|
+	< COMMENT : <LPAREN> "*" (~["*"])* "*" ("*" | ~["*","("] (~["*"])* "*")* ")">
+	|
+	< SPECIAL_SEQUENCE : "?" (~["?"])* "?" >
+	//< ALL : ~[] > //?
+}
+	
+//definição da produção
+
+/*
+void SpecialSequence() : {}
+{
+	"?" (~["?"])* "?"
+}
+*/
+
+void Lhs() : {Token t;}
+{
+	(t=<IDENTIFIER>{ jjtThis.valor= ""+t.image;})+
+}
+
+void Rhs() : {}
+{
+	Rhs1() ((<OR> | <COMMA>) Rhs())?
+}
+
+void Rhs1() : {}
+{
+	<IDENTIFIER>
+	| <TERMINAL>
+	| <LPAREN> Rhs() <RPAREN>
+	| <LBRACKET> Rhs() <RBRACKET>
+	| <LBRACE> Rhs() <RBRACE>
+	| <SPECIAL_SEQUENCE>
+}
+
+void Rule() : {/*Token t1,t2;*/}
+{
+	/*t1=Lhs() 
+	t2= <EQUALS> {System.out.println("Token : {<EQUALS : '='>}");}
+	Rhs() 
+	<SEMICOLON>
+	*/
+	Lhs() <EQUALS> Rhs() <SEMICOLON>
+}
+
+SimpleNode Start() : {/*Token t1, t2, t3;*/}
+{
+	(Rule() | <COMMENT> )+ {return jjtThis;}
+}
