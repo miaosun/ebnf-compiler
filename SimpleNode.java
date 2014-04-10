@@ -69,13 +69,13 @@ class SimpleNode implements Node {
     System.out.println(toString(prefix));
 
     if(children == null)
-      System.out.println("/t[ "+this.valor+" ]");
+      System.out.println(prefix+" ["+this.value+"]");
 
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
-          n.dump(prefix + " ");
+          n.dump(prefix +" ");
         }
       }
     }

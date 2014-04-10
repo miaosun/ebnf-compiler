@@ -3,7 +3,12 @@
 
 PARSER_BEGIN(Ebnf)
 // Código Java que invoca o parser
+import java.util.HashMap;
+import java.lang.String;
+import java.util.ArrayList;
+
 public class Ebnf {
+
 	public static void main(String args[]) throws ParseException {
 
 		// Iniciando parser
@@ -48,6 +53,22 @@ public class Ebnf {
 		}
 
 	}
+	// Guardar possiveis tokens [Identifier, (Terminal,Terminal,Terminal, ...)]
+	/*
+	HashMap<String, ArrayList<String>> TokenTable = new HashMap<String,ArrayList<String>>();
+
+    void createTokenTable(SimpleNode node) {
+         for(int i=0; i< node.jjtGetNumChildren(); i++) {
+                 createTokenTable((SimpleNode) node.jjtGetChild(i));
+         }
+         if(node.id == EbnfTreeConstants.JJTASSIGNMENT) {
+         	//find indentifier and add new String for token... FIXME
+                   TokenTable.put(node.identifier, new String(node.val));
+                   return;
+                   }
+        return;
+  }
+  */
 }
 PARSER_END(Ebnf)
 
@@ -55,7 +76,6 @@ PARSER_END(Ebnf)
 SKIP :
 {
 	" " | "\t" | "\r" | "\n"
-	//| < "//" (~["\n","\r"])* ("\n" | "\r" | "\r\n") > 
 }
 // definição dos tokens (símbolos terminais)
 TOKEN :
@@ -93,13 +113,13 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | " " | "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
 	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | " " | "_")* >
 	| 
-	< TERMINAL : (<S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE>) | (<Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK>) >
+	< TERMINAL : <S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE> | <Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK> >
 	|
 	< COMMENT : <LPAREN> "*" (~["*"])* "*" ("*" | ~["*","("] (~["*"])* "*")* ")">
 	|
@@ -108,7 +128,7 @@ TOKEN :
 }
 	
 //definição da produção
-
+//TODO faltam alguma produções para criar a AST ele está a ir buscar mal o nomes da .image. Também corrigir o problema de pensar que "A" | "B" é um terminal 
 /*
 void SpecialSequence() : {}
 {
@@ -116,27 +136,55 @@ void SpecialSequence() : {}
 }
 */
 
-void Lhs() : {Token t;}
+void Lhs() #RuleName: {Token t;}
 {
-	(t=<IDENTIFIER>{ jjtThis.valor= ""+t.image;})+
+	(t=<IDENTIFIER>{jjtThis.value= ""+t.image;})+
 }
 
-void Rhs() : {}
+void Rhs() #Sequence: {Token t;}
 {
-	Rhs1() ((<OR> | <COMMA>) Rhs())?
+	//TODO fIXME talvez separar em novas produções
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs1()  
+	(
+		(
+			<OR> {jjtThis.value= "|";} 
+			| 
+			<COMMA> {jjtThis.value= ",";} 
+			|
+			<EXCEPTION>
+		) 
+	Rhs()
+	)? 
 }
 
-void Rhs1() : {}
+/*
+* repetition-symbol
+- except-symbol
+, concatenate-symbol
+| definition-separator-symbol
+= defining-symbol
+; terminator-symbol
+*/
+
+void Rhs1() #Terminal: {Token t;}
 {
-	<IDENTIFIER>
-	| <TERMINAL>
-	| <LPAREN> Rhs() <RPAREN>
+	t=<IDENTIFIER> { jjtThis.value= ""+t.image;}
+	| 
+	t=<TERMINAL> { jjtThis.value= ""+t.image;}
+	| 
+	t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}
+	|
+	Precedence()
+}
+
+void Precedence() #Precendence: {}
+{
+	<LPAREN> Rhs() <RPAREN>
 	| <LBRACKET> Rhs() <RBRACKET>
 	| <LBRACE> Rhs() <RBRACE>
-	| <SPECIAL_SEQUENCE>
 }
-
-void Rule() : {/*Token t1,t2;*/}
+void Rule() #Rule: {/*Token t1,t2;*/}
 {
 	/*t1=Lhs() 
 	t2= <EQUALS> {System.out.println("Token : {<EQUALS : '='>}");}
@@ -146,7 +194,7 @@ void Rule() : {/*Token t1,t2;*/}
 	Lhs() <EQUALS> Rhs() <SEMICOLON>
 }
 
-SimpleNode Start() : {/*Token t1, t2, t3;*/}
+SimpleNode Start() #Start: {/*Token t1, t2, t3;*/}
 {
 	(Rule() | <COMMENT> )+ {return jjtThis;}
 }
