@@ -113,7 +113,7 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´"" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
@@ -140,6 +140,24 @@ void Lhs() #RuleName: {Token t;}
 {
 	(t=<IDENTIFIER>{jjtThis.value= ""+t.image;})+
 }
+/*
+void Rhs() #void: {Token t;}
+{
+	//TODO fIXME talvez separar em novas produções
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs1()  
+	((
+		(
+
+			<OR> {jjtThis.value= "|";} 
+			| 
+			<COMMA> {jjtThis.value= ",";} 
+			|
+			<EXCEPTION>
+		) 
+	Rhs()) #Sequence(2) 
+	)? 
+}*/
 
 void Rhs() #Sequence: {Token t;}
 {
@@ -148,14 +166,15 @@ void Rhs() #Sequence: {Token t;}
 	Rhs1()  
 	(
 		(
+
 			<OR> {jjtThis.value= "|";} 
 			| 
 			<COMMA> {jjtThis.value= ",";} 
 			|
 			<EXCEPTION>
 		) 
-	Rhs()
-	)? 
+	Rhs1() 
+	)*
 }
 
 /*
@@ -167,18 +186,18 @@ void Rhs() #Sequence: {Token t;}
 ; terminator-symbol
 */
 
-void Rhs1() #Terminal: {Token t;}
+void Rhs1() #void: {Token t;}
 {
-	t=<IDENTIFIER> { jjtThis.value= ""+t.image;}
+	(t=<IDENTIFIER> { jjtThis.value= ""+t.image;}
 	| 
 	t=<TERMINAL> { jjtThis.value= ""+t.image;}
 	| 
-	t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}
+	t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}) #Terminal
 	|
 	Precedence()
 }
 
-void Precedence() #Precendence: {}
+void Precedence() #void: {}  //mudamos precedence para void que nao e preciso
 {
 	<LPAREN> Rhs() <RPAREN>
 	| <LBRACKET> Rhs() <RBRACKET>
