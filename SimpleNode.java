@@ -103,7 +103,7 @@ public String printSequence() {
     SimpleNode ni = (SimpleNode) children[i];
     res+=ni.jjtGetValue()+" ";
   }
-  return res+" >";
+  return res+" > ";
 }
 }
 /* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */
