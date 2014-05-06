@@ -59,14 +59,17 @@ class SimpleNode implements Node {
      toString(String), otherwise overriding toString() is probably all
      you need to do. */
 
-  public String toString() { return EbnfTreeConstants.jjtNodeName[id]; }
-  public String toString(String prefix) { return prefix + toString(); }
+     public String toString() { return EbnfTreeConstants.jjtNodeName[id]; }
+     public String toString(String prefix) { return prefix + toString(); }
 
   /* Override this method if you want to customize how the node dumps
-     out its children. */
+  out its children. */
 
   public void dump(String prefix) {
     System.out.println(toString(prefix));
+
+    if(this.id == EbnfTreeConstants.JJTRULE)
+      printRule();
 
     if(children == null)
       System.out.println(prefix+" ["+this.value+"]");
@@ -80,6 +83,27 @@ class SimpleNode implements Node {
       }
     }
   }
+
+
+  public void printRule() {
+    if(children == null) {
+      System.out.println("ERROR");
+      System.exit(1);
+    }
+    SimpleNode n0 = (SimpleNode) children[0];
+    String res="< "+n0.jjtGetValue()+" : ";
+SimpleNode n = (SimpleNode)children[2];
+res+=n.printSequence();
+System.out.println("RULE: "+res);
 }
 
+public String printSequence() {
+  String res = "";
+  for (int i = 0; i < children.length; ++i) {
+    SimpleNode ni = (SimpleNode) children[i];
+    res+=ni.jjtGetValue()+" ";
+  }
+  return res+" >";
+}
+}
 /* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */

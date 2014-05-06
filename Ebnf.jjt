@@ -113,15 +113,15 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´"" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
 	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT> | " " | "_")* >
-	| 
+	|
 	< TERMINAL : <S_QUOTE> <CARACTER> (<CARACTER>)* <S_QUOTE> | <Q_MARK> <CARACTER> (<CARACTER>)* <Q_MARK> >
 	|
-	< COMMENT : <LPAREN> "*" (~["*"])* "*" ("*" | ~["*","("] (~["*"])* "*")* ")">
+	< COMMENT : <LPAREN> "*" (~["*"])* "*" ("*" | ~["*","("] (~["*"])* "*")* <RPAREN>>
 	|
 	< SPECIAL_SEQUENCE : "?" (~["?"])* "?" >
 	//< ALL : ~[] > //?
@@ -188,29 +188,29 @@ void Rhs() #Sequence: {Token t;}
 
 void Rhs1() #void: {Token t;}
 {
-	(t=<IDENTIFIER> { jjtThis.value= ""+t.image;}
+	(t=<IDENTIFIER> { jjtThis.value= ""+t.image;}) #Identifier
 	| 
-	t=<TERMINAL> { jjtThis.value= ""+t.image;}
+	(t=<TERMINAL> { jjtThis.value= ""+t.image;}) #Terminal
 	| 
-	t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}) #Terminal
+	(t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}) #SpecialSeq
 	|
 	Precedence()
 }
 
 void Precedence() #void: {}  //mudamos precedence para void que nao e preciso
 {
-	<LPAREN> Rhs() <RPAREN>
-	| <LBRACKET> Rhs() <RBRACKET>
-	| <LBRACE> Rhs() <RBRACE>
+	(<LPAREN> Rhs() <RPAREN>) #Grouping
+	| (<LBRACKET> Rhs() <RBRACKET>) #Option
+	| (<LBRACE> Rhs() <RBRACE>) #Repetition
 }
-void Rule() #Rule: {/*Token t1,t2;*/}
+void Rule() #Rule: {Token t1;}
 {
 	/*t1=Lhs() 
 	t2= <EQUALS> {System.out.println("Token : {<EQUALS : '='>}");}
 	Rhs() 
 	<SEMICOLON>
 	*/
-	Lhs() <EQUALS> Rhs() <SEMICOLON>
+	Lhs() t1=<EQUALS> { jjtThis.value= ""+t1.image;} #Equals Rhs() <SEMICOLON>
 }
 
 SimpleNode Start() #Start: {/*Token t1, t2, t3;*/}
