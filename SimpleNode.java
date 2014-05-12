@@ -42,7 +42,6 @@ class SimpleNode implements Node {
     return true;
   }
 
-
   public SimpleNode(int i) {
     id = i;
   }
@@ -97,9 +96,18 @@ class SimpleNode implements Node {
 
   public void dump(String prefix) {
     System.out.println(toString(prefix));
+    dump2(prefix +" ");
 
-    if(this.id == EbnfTreeConstants.JJTRULE)
-      printRule();
+    for (int i = 0; i < children.length; i++) {
+        SimpleNode n = (SimpleNode)children[i];
+        if (n != null) {
+          n.printNode(writer);
+        }
+      }
+  }
+
+  public void dump2(String prefix) {
+    System.out.println(toString(prefix));
 
     if(children == null)
       System.out.println(prefix+" ["+this.value+"]");
@@ -108,7 +116,7 @@ class SimpleNode implements Node {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
-          n.dump(prefix +" ");
+           n.dump2(prefix +" ");
         }
       }
     }
@@ -121,19 +129,65 @@ class SimpleNode implements Node {
       System.exit(1);
     }
     SimpleNode n0 = (SimpleNode) children[0];
-    String res="< "+n0.jjtGetValue()+" : ";
+    writer.write("< "+n0.jjtGetValue()+" : ");
     SimpleNode n = (SimpleNode)children[2];
-    res+=n.printSequence();
-    System.out.println("RULE: "+res);
+    n.printNode(writer);
+    writer.write(" >");}
+
+public void printSequence(Writer writer) throws IOException {
+  for (int i = 0; i < children.length; i++) {
+    SimpleNode ni = (SimpleNode) children[i];
+    if(ni.value == "|")
+    {
+      writer.write(" | ");
+    }
+    else if(ni.value == ",")
+      writer.write(" ");
+
+    ni.printNode(writer);
+  }
+}
+
+public void printRepetition(Writer writer) throws IOException {
+  writer.write("( ");
+
+  for (int i = 0; i < children.length; i++) {
+    SimpleNode ni = (SimpleNode) children[i];
+    ni.printNode(writer);
+
+  }
+  writer.write(" )*");
+
+}
+
+public void printNode(Writer writer) throws IOException {
+    
+  switch(this.id)
+  {
+    case EbnfTreeConstants.JJTRULE :
+      printRule(writer);
+      writer.write("passeiRULE");
+      writer.write("\n");
+      break;
+    case EbnfTreeConstants.JJTSEQUENCE :
+     writer.write("passeiSEQUENCE");
+      printSequence(writer);
+      break;
+    case EbnfTreeConstants.JJTREPETITION :
+      writer.write("passeiREP");
+      printRepetition(writer);
+      break;
+    case EbnfTreeConstants.JJTIDENTIFIER :
+      writer.write(this.jjtGetValue()+" ");
+      break;
+    case EbnfTreeConstants.JJTTERMINAL :    
+      writer.write(this.jjtGetValue()+" ");
+      break;
+    default :
+        break;
   }
 
-  public String printSequence() {
-    String res = "";
-    for (int i = 0; i < children.length; ++i) {
-      SimpleNode ni = (SimpleNode) children[i];
-      res+=ni.jjtGetValue()+" ";
-    }
-    return res+" > ";
-  }
+}
+
 }
 /* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */
