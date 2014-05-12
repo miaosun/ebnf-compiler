@@ -130,64 +130,96 @@ class SimpleNode implements Node {
     }
     SimpleNode n0 = (SimpleNode) children[0];
     writer.write("< "+n0.jjtGetValue()+" : ");
-    SimpleNode n = (SimpleNode)children[2];
+    SimpleNode n = (SimpleNode)children[1];
     n.printNode(writer);
-    writer.write(" >");}
+    writer.write(" >");
+  }
 
 public void printSequence(Writer writer) throws IOException {
   for (int i = 0; i < children.length; i++) {
     SimpleNode ni = (SimpleNode) children[i];
-    if(ni.value == "|")
+    //System.out.println("teste:"+ni.value);
+    ni.printNode(writer);
+    if(this.value != null && i < children.length-1 )
     {
-      writer.write(" | ");
+      //System.out.println("teste/:"+ni.value);
+      if(this.value.equals("|"))
+      {
+        writer.write(" | ");
+      }
+      else
+        if(this.value.equals(","))
+          writer.write(" ");
     }
-    else if(ni.value == ",")
-      writer.write(" ");
-
-    ni.printNode(writer);
-  }
+}
 }
 
-public void printRepetition(Writer writer) throws IOException {
-  writer.write("( ");
+  public void printRepetition(Writer writer) throws IOException {
+    writer.write(" ( ");
 
-  for (int i = 0; i < children.length; i++) {
-    SimpleNode ni = (SimpleNode) children[i];
-    ni.printNode(writer);
+    for (int i = 0; i < children.length; i++) {
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
+
+    }
+    writer.write(" )* ");
 
   }
-  writer.write(" )*");
+  public void printGrouping(Writer writer) throws IOException {
+    writer.write(" ( ");
 
-}
+    for (int i = 0; i < children.length; i++) {
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
 
-public void printNode(Writer writer) throws IOException {
-    
-  switch(this.id)
-  {
-    case EbnfTreeConstants.JJTRULE :
-      printRule(writer);
-      writer.write("passeiRULE");
-      writer.write("\n");
-      break;
-    case EbnfTreeConstants.JJTSEQUENCE :
-     writer.write("passeiSEQUENCE");
-      printSequence(writer);
-      break;
-    case EbnfTreeConstants.JJTREPETITION :
-      writer.write("passeiREP");
-      printRepetition(writer);
-      break;
-    case EbnfTreeConstants.JJTIDENTIFIER :
-      writer.write(this.jjtGetValue()+" ");
-      break;
-    case EbnfTreeConstants.JJTTERMINAL :    
-      writer.write(this.jjtGetValue()+" ");
-      break;
-    default :
+    }
+    writer.write(" ) ");
+  }
+  public void printOptional(Writer writer) throws IOException {
+    writer.write(" [ ");
+
+    for (int i = 0; i < children.length; i++) {
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
+    }
+    writer.write(" ] ");
+  }
+
+  public void printNode(Writer writer) throws IOException {
+      
+    switch(this.id)
+    {
+      case EbnfTreeConstants.JJTRULE :
+        printRule(writer);
+        writer.write("\n");
         break;
+      case EbnfTreeConstants.JJTSEQUENCE :
+        printSequence(writer);
+        break;
+      case EbnfTreeConstants.JJTREPETITION :
+        printRepetition(writer);
+        break;
+      case EbnfTreeConstants.JJTIDENTIFIER :
+        writer.write(this.jjtGetValue()+" ");
+        break;
+      case EbnfTreeConstants.JJTTERMINAL :    
+        writer.write(this.jjtGetValue()+" ");
+        break;
+      case EbnfTreeConstants.JJTGROUPING :
+        printGrouping(writer);
+        break;
+      case EbnfTreeConstants.JJTOPTION :
+        printOptional(writer);
+        break;
+      case EbnfTreeConstants.JJTSPECIALSEQ :
+        writer.write(this.jjtGetValue()+" ");
+        break;
+      default :   
+        System.out.println("Não processado: "+EbnfTreeConstants.jjtNodeName[this.id]);
+        break;
+    }
+
   }
-
 }
 
-}
 /* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */

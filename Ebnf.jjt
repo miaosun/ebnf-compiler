@@ -217,7 +217,7 @@ void Rhs1() #void: {Token t;}
 	Precedence()
 }
 
-void Precedence(): {}  //mudamos precedence para void que nao e preciso
+void Precedence() #void: {}  //mudamos precedence para void que nao e preciso
 {
 	(<LPAREN> Rhs() <RPAREN>) #Grouping
 	| (<LBRACKET> Rhs() <RBRACKET>) #Option
@@ -230,7 +230,7 @@ void Rule() #Rule: {Token t1;}
 	Rhs() 
 	<SEMICOLON>
 	*/
-	Lhs() t1=<EQUALS> { jjtThis.value= ""+t1.image;} #Equals Rhs() <SEMICOLON>
+	Lhs() t1=<EQUALS> Rhs() <SEMICOLON>
 }
 
 SimpleNode Start() #Start: {/*Token t1, t2, t3;*/}
