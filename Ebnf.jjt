@@ -40,6 +40,13 @@ public class Ebnf {
 		try {
 			SimpleNode root = parser.Start();
 			root.dump("");
+			SimpleNode.dumpIds();
+			if(!root.verifyIdentifiers())
+			{
+				System.out.println("\nABORT!");
+				System.exit(1);
+			}
+				
 			System.out.println ("\nParser: The input was readed sucessfully.");
 
 		}
@@ -138,7 +145,7 @@ void SpecialSequence() : {}
 
 void Lhs() #RuleName: {Token t;}
 {
-	(t=<IDENTIFIER>{jjtThis.value= ""+t.image;})+
+	(t=<IDENTIFIER>{jjtThis.value= ""+t.image.trim().replace(" ", "_"); SimpleNode.addIdentifier(""+t.image);})+ // + necessario?
 }
 /*
 void Rhs() #void: {Token t;}
@@ -167,9 +174,9 @@ void Rhs() #Sequence: {Token t;}
 	(
 		(
 
-			<OR> {jjtThis.value= "|";} 
+			<OR> {jjtThis.value= "|";}
 			| 
-			<COMMA> {jjtThis.value= ",";} 
+			<COMMA> {jjtThis.value= ",";}
 			|
 			<EXCEPTION>
 		) 
@@ -188,7 +195,7 @@ void Rhs() #Sequence: {Token t;}
 
 void Rhs1() #void: {Token t;}
 {
-	(t=<IDENTIFIER> { jjtThis.value= ""+t.image;}) #Identifier
+	(t=<IDENTIFIER> { jjtThis.value= ""+t.image.trim().replace(" ", "_");}) #Identifier
 	| 
 	(t=<TERMINAL> { jjtThis.value= ""+t.image;}) #Terminal
 	| 
