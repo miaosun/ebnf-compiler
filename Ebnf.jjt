@@ -44,9 +44,11 @@ public class Ebnf {
 			return ;
 		}
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+args[0]), "utf-8"));
+			String name = ""+args[0];
+			name = name.replace(".txt",".jj");
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
-			root.dump("",writer);
+			root.dump("",writer,parser.getClass().getName());
 			System.out.println ("\nParser: The input was readed sucessfully.");
 
 		}

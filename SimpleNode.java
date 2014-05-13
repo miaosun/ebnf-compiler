@@ -72,11 +72,18 @@ class SimpleNode implements Node {
   /* Override this method if you want to customize how the node dumps
   out its children. */
 
-  public void dump(String prefix, Writer writer) throws IOException{
+  public void dump(String prefix, Writer writer, String programName) throws IOException{
     System.out.println(toString(prefix));
 
     dump2(prefix +" ");
 
+    generateParser(writer,programName);
+
+    startPrints(writer);
+  }
+
+  public void startPrints(Writer writer) throws IOException
+  {
     for (int i = 0; i < children.length; i++) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
@@ -101,6 +108,25 @@ class SimpleNode implements Node {
     }
   }
 
+  public void generateParser(Writer writer, String name) throws IOException {
+    writer.write("PARSER_BEGIN("+name+")\n");
+    writer.write("class "+name+" { }\n");
+    writer.write("PARSER_END("+name+")\n");
+    writer.write("SKIP : { \" \" | \"\\t\" | \"\\r\" | \"\\n\" }\n");
+    writer.write("TOKEN : {"+getTokens()+"}\n");
+    startPrints(writer);
+  }
+
+  public String getTokens()
+  {
+    for (int i = 0; i < children.length; i++) {
+        SimpleNode n = (SimpleNode)children[i];
+        if (n != null) {
+          if(""+n.jjtGetValue().matches(^"*$"))
+        }
+      }
+  }
+
 
   public void printRule(Writer writer) throws IOException {
     if(children == null) {
@@ -108,10 +134,10 @@ class SimpleNode implements Node {
       System.exit(1);
     }
     SimpleNode n0 = (SimpleNode) children[0];
-    writer.write("< "+n0.jjtGetValue()+" : ");
+    writer.write("void "+n0.jjtGetValue()+"() : \n { ");
     SimpleNode n = (SimpleNode)children[1];
     n.printNode(writer);
-    writer.write(" >");
+    writer.write(" }");
   }
 
 public void printSequence(Writer writer) throws IOException {
@@ -192,7 +218,10 @@ public void printSequence(Writer writer) throws IOException {
         printOptional(writer);
         break;
       case EbnfTreeConstants.JJTSPECIALSEQ :
-        writer.write(this.jjtGetValue()+" ");
+        String str = ""+this.jjtGetValue();
+        str = str.replace("?","\"");
+        str = str.replace(" ","_");
+        writer.write(str);
         break;
       default :   
         System.out.println("Não processado: "+EbnfTreeConstants.jjtNodeName[this.id]);
