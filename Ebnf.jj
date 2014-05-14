@@ -3,7 +3,7 @@
 
 
 PARSER_BEGIN(Ebnf)
-// C\u00f3digo Java que invoca o parser
+// C\u00c3\u00b3digo Java que invoca o parser
 import java.util.HashMap;
 import java.lang.String;
 import java.util.ArrayList;
@@ -13,18 +13,16 @@ import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 public class Ebnf/*@bgen(jjtree)*/implements EbnfTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected static JJTEbnfState jjtree = new JJTEbnfState();
 
 /*@egen*/
 
-	public static void main(String args[]) throws ParseException, IOException {
+	public static void main(String args[]) throws ParseException {
 
 		// Iniciando parser
 		Ebnf parser;
 		Writer writer = null;
-
 
 		// Ler de do STD
 		if(args.length == 0){
@@ -50,9 +48,18 @@ public class Ebnf/*@bgen(jjtree)*/implements EbnfTreeConstants/*@egen*/ {/*@bgen
 			return ;
 		}
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+args[0]), "utf-8"));
+			String name = ""+args[0];
+			name = name.replace(".txt",".jj");
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
-			root.dump("",writer);
+			root.dump("",writer,parser.getClass().getName());
+			SimpleNode.dumpIds();
+			SimpleNode.dumpTokens();
+			if(!root.verifyIdentifiers())
+			{
+				System.out.println("\nABORT!");
+				System.exit(1);
+			}
 			System.out.println ("\nParser: The input was readed sucessfully.");
 
 		}
@@ -92,12 +99,12 @@ public class Ebnf/*@bgen(jjtree)*/implements EbnfTreeConstants/*@egen*/ {/*@bgen
 }
 PARSER_END(Ebnf)
 
-// s\u00edmbolos que n\u00e3o devem ser considerados na an\u00e1lise
+// s\u00c3\u00admbolos que n\u00c3\u00a3o devem ser considerados na an\u00c3\u00a1lise
 SKIP :
 {
 	" " | "\t" | "\r" | "\n"
 }
-// defini\u00e7\u00e3o dos tokens (s\u00edmbolos terminais)
+// defini\u00c3\u00a7\u00c3\u00a3o dos tokens (s\u00c3\u00admbolos terminais)
 TOKEN :
 {
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
@@ -133,7 +140,7 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "\u00b4" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "\u00c2\u00b4" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
@@ -147,8 +154,8 @@ TOKEN :
 	//< ALL : ~[] > //?
 }
 	
-//defini\u00e7\u00e3o da produ\u00e7\u00e3o
-//TODO faltam alguma produ\u00e7\u00f5es para criar a AST ele est\u00e1 a ir buscar mal o nomes da .image. Tamb\u00e9m corrigir o problema de pensar que "A" | "B" \u00e9 um terminal 
+//defini\u00c3\u00a7\u00c3\u00a3o da produ\u00c3\u00a7\u00c3\u00a3o
+//TODO faltam alguma produ\u00c3\u00a7\u00c3\u00b5es para criar a AST ele est\u00c3\u00a1 a ir buscar mal o nomes da .image. Tamb\u00c3\u00a9m corrigir o problema de pensar que "A" | "B" \u00c3\u00a9 um terminal 
 /*
 void SpecialSequence() : {}
 {
@@ -164,18 +171,18 @@ void Lhs()          : {/*@bgen(jjtree) RuleName */
 {/*@bgen(jjtree) RuleName */
         try {
 /*@egen*/
-	(t=<IDENTIFIER>{jjtn000.value= ""+t.image;})+/*@bgen(jjtree)*/
+	(t=<IDENTIFIER>{jjtn000.value= ""+t.image.trim().replace(" ", "_"); SimpleNode.addIdentifier(""+t.image);})+/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
           }
         }
-/*@egen*/
+/*@egen*/ // + necessario?
 }
 /*
 void Rhs() #void: {Token t;}
 {
-	//TODO fIXME talvez separar em novas produ\u00e7\u00f5es
+	//TODO fIXME talvez separar em novas produ\u00c3\u00a7\u00c3\u00b5es
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	((
@@ -199,17 +206,17 @@ void Rhs()          : {/*@bgen(jjtree) Sequence */
 {/*@bgen(jjtree) Sequence */
         try {
 /*@egen*/
-	//TODO fIXME talvez separar em novas produ\u00e7\u00f5es
+	//TODO fIXME talvez separar em novas produ\u00c3\u00a7\u00c3\u00b5es
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	(
 		(
 
-			<OR> {jjtn000.value= "|";} 
+			<OR> {jjtn000.value= "|";}
 			| 
-			<COMMA> {jjtn000.value= ",";} 
+			<COMMA> {jjtn000.value= ",";}
 			|
-			<EXCEPTION>
+			<EXCEPTION> 
 		) 
 	Rhs1() 
 	)*/*@bgen(jjtree)*/
@@ -258,7 +265,7 @@ void Rhs1()      : {Token t;}
                           jjtree.closeNodeScope(jjtn001, true);
                           jjtc001 = false;
                         }
-/*@egen*/ { jjtn001.value= ""+t.image;})/*@bgen(jjtree)*/
+/*@egen*/ { jjtn001.value= ""+t.image.trim().replace(" ", "_");})/*@bgen(jjtree)*/
         } finally {
           if (jjtc001) {
             jjtree.closeNodeScope(jjtn001, true);
@@ -273,18 +280,21 @@ void Rhs1()      : {Token t;}
         }
         try {
 /*@egen*/ 
-	(t=<TERMINAL>/*@bgen(jjtree)*/
-                      {
-                        jjtree.closeNodeScope(jjtn002, true);
-                        jjtc002 = false;
-                      }
-/*@egen*/ { jjtn002.value= ""+t.image;})/*@bgen(jjtree)*/
+	(t=<TERMINAL> 
+		{
+			jjtn002.value= ""+t.image.trim().replace(" ", "_");
+			if(!SimpleNode.containsToken(""+t.image))
+				if((""+t.image).equals("\'"))
+					SimpleNode.addToken("\"\\"+t.image+"\"");
+				else
+					SimpleNode.addToken(""+t.image);
+		})+/*@bgen(jjtree)*/
         } finally {
           if (jjtc002) {
             jjtree.closeNodeScope(jjtn002, true);
           }
         }
-/*@egen*/          
+/*@egen*/           // + necessario?
 	|/*@bgen(jjtree) SpecialSeq */
         {
           SimpleNode jjtn003 = new SimpleNode(JJTSPECIALSEQ);
@@ -409,25 +419,7 @@ void Rule()      : {/*@bgen(jjtree) Rule */
 	Rhs() 
 	<SEMICOLON>
 	*/
-	Lhs() t1=<EQUALS>/*@bgen(jjtree) Equals */
-                          {
-                            SimpleNode jjtn001 = new SimpleNode(JJTEQUALS);
-                            boolean jjtc001 = true;
-                            jjtree.openNodeScope(jjtn001);
-                          }
-                          try {
-/*@egen*//*@bgen(jjtree)*/
-                          {
-                            jjtree.closeNodeScope(jjtn001, true);
-                            jjtc001 = false;
-                          }
-/*@egen*/ { jjtn001.value= ""+t1.image;}/*@bgen(jjtree)*/
-                          } finally {
-                            if (jjtc001) {
-                              jjtree.closeNodeScope(jjtn001, true);
-                            }
-                          }
-/*@egen*/         Rhs() <SEMICOLON>/*@bgen(jjtree)*/
+	Lhs() t1=<EQUALS> Rhs() <SEMICOLON>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
