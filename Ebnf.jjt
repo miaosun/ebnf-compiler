@@ -50,6 +50,7 @@ public class Ebnf {
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
 			SimpleNode.dumpIds();
+			SimpleNode.dumpTokens();
 			if(!root.verifyIdentifiers())
 			{
 				System.out.println("\nABORT!");
@@ -212,7 +213,15 @@ void Rhs1() #void: {Token t;}
 {
 	(t=<IDENTIFIER> { jjtThis.value= ""+t.image.trim().replace(" ", "_");}) #Identifier
 	| 
-	(t=<TERMINAL> { jjtThis.value= ""+t.image;}) #Terminal
+	(t=<TERMINAL> 
+		{
+			jjtThis.value= ""+t.image.trim().replace(" ", "_");
+			if(!SimpleNode.containsToken(""+t.image))
+				if((""+t.image).equals("\'"))
+					SimpleNode.addToken("\"\\"+t.image+"\"");
+				else
+					SimpleNode.addToken(""+t.image);
+		})+ #Terminal // + necessario?
 	| 
 	(t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}) #SpecialSeq
 	|

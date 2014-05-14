@@ -21,3 +21,5 @@ Token.java
 TokenMgrError.class
 TokenMgrError.java
 JavaCCtest1.jj
+*.class
+*.jj
