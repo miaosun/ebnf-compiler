@@ -55,6 +55,7 @@ public class Ebnf/*@bgen(jjtree)*/implements EbnfTreeConstants/*@egen*/ {/*@bgen
 			root.dump("",writer,parser.getClass().getName());
 			SimpleNode.dumpIds();
 			SimpleNode.dumpTokens();
+			SimpleNode.dumpNames();
 			if(!root.verifyIdentifiers())
 			{
 				System.out.println("\nABORT!");
@@ -198,48 +199,92 @@ void Rhs() #void: {Token t;}
 	)? 
 }*/
 
-void Rhs()          : {/*@bgen(jjtree) Sequence */
-                       SimpleNode jjtn000 = new SimpleNode(JJTSEQUENCE);
-                       boolean jjtc000 = true;
-                       jjtree.openNodeScope(jjtn000);
-/*@egen*/Token t;}
-{/*@bgen(jjtree) Sequence */
-        try {
-/*@egen*/
+void Rhs()      : {Token t;}
+{
+	//TODO fIXME talvez separar em novas produ\u00c3\u00a7\u00c3\u00b5es
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs2()  
+	(
+		(
+			<OR>/*@bgen(jjtree) Union */
+                             {
+                               SimpleNode jjtn001 = new SimpleNode(JJTUNION);
+                               boolean jjtc001 = true;
+                               jjtree.openNodeScope(jjtn001);
+                             }
+                             try {
+/*@egen*//*@bgen(jjtree)*/
+                             {
+                               jjtree.closeNodeScope(jjtn001, true);
+                               jjtc001 = false;
+                             }
+/*@egen*/ {jjtn001.value= "|";}/*@bgen(jjtree)*/
+                             } finally {
+                               if (jjtc001) {
+                                 jjtree.closeNodeScope(jjtn001, true);
+                               }
+                             }
+/*@egen*/       
+		) 
+	Rhs()
+	)*
+}
+
+void Rhs2()      : {Token t;}
+{
+	//TODO fIXME talvez separar em novas produ\u00c3\u00a7\u00c3\u00b5es
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs3()  
+	(
+		(
+			<COMMA>/*@bgen(jjtree) Concat */
+                                {
+                                  SimpleNode jjtn001 = new SimpleNode(JJTCONCAT);
+                                  boolean jjtc001 = true;
+                                  jjtree.openNodeScope(jjtn001);
+                                }
+                                try {
+/*@egen*//*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn001, true);
+                                  jjtc001 = false;
+                                }
+/*@egen*/ {jjtn001.value= ",";}/*@bgen(jjtree)*/
+                                } finally {
+                                  if (jjtc001) {
+                                    jjtree.closeNodeScope(jjtn001, true);
+                                  }
+                                }
+/*@egen*/        
+		) 
+	Rhs2() 
+	)*
+}
+
+void Rhs3()      : {Token t;}
+{
 	//TODO fIXME talvez separar em novas produ\u00c3\u00a7\u00c3\u00b5es
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	(
-		(
-
-			<OR> {jjtn000.value= "|";}
-			| 
-			<COMMA> {jjtn000.value= ",";}
-			|
-			<EXCEPTION> 
+		(/*@bgen(jjtree) Except */
+                        {
+                          SimpleNode jjtn001 = new SimpleNode(JJTEXCEPT);
+                          boolean jjtc001 = true;
+                          jjtree.openNodeScope(jjtn001);
+                        }
+                        try {
+/*@egen*/
+			<EXCEPTION>/*@bgen(jjtree)*/
+                        } finally {
+                          if (jjtc001) {
+                            jjtree.closeNodeScope(jjtn001, true);
+                          }
+                        }
+/*@egen*/        
 		) 
 	Rhs1() 
-	)*/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-/*@egen*/
+	)?
 }
 
 /*

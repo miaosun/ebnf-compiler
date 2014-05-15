@@ -51,6 +51,7 @@ public class Ebnf {
 			root.dump("",writer,parser.getClass().getName());
 			SimpleNode.dumpIds();
 			SimpleNode.dumpTokens();
+			SimpleNode.dumpNames();
 			if(!root.verifyIdentifiers())
 			{
 				System.out.println("\nABORT!");
@@ -182,22 +183,43 @@ void Rhs() #void: {Token t;}
 	)? 
 }*/
 
-void Rhs() #Sequence: {Token t;}
+void Rhs() #void: {Token t;}
+{
+	//TODO fIXME talvez separar em novas produções
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs2()  
+	(
+		(
+			<OR> {jjtThis.value= "|";} #Union
+		) 
+	Rhs()
+	)*
+}
+
+void Rhs2() #void: {Token t;}
+{
+	//TODO fIXME talvez separar em novas produções
+	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs3()  
+	(
+		(
+			<COMMA> {jjtThis.value= ",";} #Concat
+		) 
+	Rhs2() 
+	)*
+}
+
+void Rhs3() #void: {Token t;}
 {
 	//TODO fIXME talvez separar em novas produções
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	(
 		(
-
-			<OR> {jjtThis.value= "|";}
-			| 
-			<COMMA> {jjtThis.value= ",";}
-			|
-			<EXCEPTION> 
+			<EXCEPTION> #Except
 		) 
 	Rhs1() 
-	)*
+	)?
 }
 
 /*
