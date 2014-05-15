@@ -2,7 +2,7 @@
 
 
 PARSER_BEGIN(Ebnf)
-// Código Java que invoca o parser
+// CÃ³digo Java que invoca o parser
 import java.util.HashMap;
 import java.lang.String;
 import java.util.ArrayList;
@@ -96,12 +96,12 @@ public class Ebnf {
 }
 PARSER_END(Ebnf)
 
-// símbolos que não devem ser considerados na análise
+// sÃ­mbolos que nÃ£o devem ser considerados na anÃ¡lise
 SKIP :
 {
 	" " | "\t" | "\r" | "\n"
 }
-// definição dos tokens (símbolos terminais)
+// definiÃ§Ã£o dos tokens (sÃ­mbolos terminais)
 TOKEN :
 {
 	< LETTER : ["A"-"Z"] | ["a"-"z"] >
@@ -137,7 +137,7 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "Â´" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
@@ -151,8 +151,8 @@ TOKEN :
 	//< ALL : ~[] > //?
 }
 	
-//definição da produção
-//TODO faltam alguma produções para criar a AST ele está a ir buscar mal o nomes da .image. Também corrigir o problema de pensar que "A" | "B" é um terminal 
+//definiÃ§Ã£o da produÃ§Ã£o
+//TODO faltam alguma produÃ§Ãµes para criar a AST ele estÃ¡ a ir buscar mal o nomes da .image. TambÃ©m corrigir o problema de pensar que "A" | "B" Ã© um terminal 
 /*
 void SpecialSequence() : {}
 {
@@ -167,7 +167,7 @@ void Lhs() #RuleName: {Token t;}
 /*
 void Rhs() #void: {Token t;}
 {
-	//TODO fIXME talvez separar em novas produções
+	//TODO fIXME talvez separar em novas produÃ§Ãµes
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	((
@@ -183,43 +183,22 @@ void Rhs() #void: {Token t;}
 	)? 
 }*/
 
-void Rhs() #void: {Token t;}
+void Rhs() #Sequence: {Token t;}
 {
-	//TODO fIXME talvez separar em novas produções
-	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
-	Rhs2()  
-	(
-		(
-			<OR> {jjtThis.value= "|";} #Union
-		) 
-	Rhs()
-	)*
-}
-
-void Rhs2() #void: {Token t;}
-{
-	//TODO fIXME talvez separar em novas produções
-	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
-	Rhs3()  
-	(
-		(
-			<COMMA> {jjtThis.value= ",";} #Concat
-		) 
-	Rhs2() 
-	)*
-}
-
-void Rhs3() #void: {Token t;}
-{
-	//TODO fIXME talvez separar em novas produções
+	//TODO fIXME talvez separar em novas produÃ§Ãµes
 	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
 	Rhs1()  
 	(
 		(
-			<EXCEPTION> #Except
+
+			<OR> {jjtThis.value= "|";}
+			| 
+			<COMMA> {jjtThis.value= ",";}
+			|
+			<EXCEPTION> 
 		) 
 	Rhs1() 
-	)?
+	)*
 }
 
 /*
@@ -238,10 +217,9 @@ void Rhs1() #void: {Token t;}
 	(t=<TERMINAL> 
 		{
 			jjtThis.value= ""+t.image.trim().replace(" ", "_");
-			if(!SimpleNode.containsToken(""+t.image))
-				if((""+t.image).equals("\'"))
-					SimpleNode.addToken("\"\\"+t.image+"\"");
-				else
+			String test = (""+t.image).trim().replace("\'", "");
+			String test2 = (""+t.image).trim().replace("\"", "");
+			if(! (SimpleNode.containsToken(test) || SimpleNode.containsToken(test2)))
 					SimpleNode.addToken(""+t.image);
 		})+ #Terminal // + necessario?
 	| 
