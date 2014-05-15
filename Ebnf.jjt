@@ -56,7 +56,7 @@ public class Ebnf {
 			name = name.replace(".txt",".jj");
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
-			root.dump("",writer,parser.getClass().getName());
+			//root.dump("",writer,parser.getClass().getName());
 			SimpleNode.dumpIds();
 			SimpleNode.dumpTokens();
 			SimpleNode.dumpNames();
