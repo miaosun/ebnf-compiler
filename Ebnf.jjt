@@ -11,14 +11,22 @@ import java.io.Writer;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.regex.*;
+
 
 public class Ebnf {
+
+	public static Pattern patternQuotes;
+	public static Pattern patternQuotationMarks; 
+	public static Matcher matcher;
 
 	public static void main(String args[]) throws ParseException {
 
 		// Iniciando parser
 		Ebnf parser;
 		Writer writer = null;
+		patternQuotes = Pattern.compile("^\'(.*?)\'$");
+		patternQuotationMarks = Pattern.compile("^\"(.*?)\"$");
 
 		// Ler de do STD
 		if(args.length == 0){
@@ -217,10 +225,24 @@ void Rhs1() #void: {Token t;}
 	(t=<TERMINAL> 
 		{
 			jjtThis.value= ""+t.image.trim().replace(" ", "_");
-			String test = (""+t.image).trim().replace("\'", "");
-			String test2 = (""+t.image).trim().replace("\"", "");
-			if(! (SimpleNode.containsToken(test) || SimpleNode.containsToken(test2)))
-					SimpleNode.addToken(""+t.image);
+			matcher = patternQuotes.matcher(""+t.image);
+			System.out.println("VALOR DO TERMINAL:"+t.image+"!");
+			if(matcher.matches())
+			{
+				System.out.println("entrei no 1 match");
+				if(!SimpleNode.containsToken(matcher.group(1)))
+					SimpleNode.addToken(matcher.group(1));
+			}
+			else
+			{
+				matcher = patternQuotationMarks.matcher(""+t.image);
+				if(matcher.matches())
+				{
+					System.out.println("entrei no 2 match");
+					if(!SimpleNode.containsToken(matcher.group(1)))
+						SimpleNode.addToken(matcher.group(1));
+				}
+			}
 		})+ #Terminal // + necessario?
 	| 
 	(t=<SPECIAL_SEQUENCE> { jjtThis.value= ""+t.image;}) #SpecialSeq

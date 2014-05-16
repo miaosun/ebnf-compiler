@@ -31,13 +31,7 @@ class SimpleNode implements Node {
   }
 
   public static void addToken(String i){
-    // if(i.length() > 1)
-    // {
-      if(i.charAt(0) == ('\'')) //TODO FIX ME SE FOR SIMBOLO ' ou " tem que se por dentro de casos especiais!!
-        i = i.trim().replace("\'", "");
-      if(i.charAt(0) == ('\"'))
-        i = i.trim().replace("\"", "");
-    //}
+  
     Pattern p = Pattern.compile("[^a-zA-Z0-9\\s]*"); //wtfomgbbq pk é que isto está a fazer match de NAO PALAVRAS quando deveria ser DE PALAVRAS so????
     Matcher m = p.matcher(i);    
     if(m.matches())
@@ -52,7 +46,8 @@ class SimpleNode implements Node {
       String string = str.nextString();
       if(!symbolNames.contains(string))
         symbolNames.add(string);
-      tokensJavaCC.add(i.trim().replace("\'", ""));
+      //tokensJavaCC.add(i.trim().replace("\'", ""));
+      tokensJavaCC.add(i);
     }
     else
     {
@@ -209,9 +204,20 @@ class SimpleNode implements Node {
       if(m.matches())
       { 
         if(i != tokensJavaCC.size()-1)
-          tokens+="< "+symbolNames.get(j)+" : \'"+tokensJavaCC.get(i)+"\' > | \n";
-         else
-          tokens+="< "+symbolNames.get(j)+" : \'"+tokensJavaCC.get(i)+"\' >";
+        {
+          if(!tokensJavaCC.get(i).equals("\'"))
+              tokens+="< "+symbolNames.get(j)+" : \'"+tokensJavaCC.get(i)+"\' > | \n";
+            else
+              tokens+="< "+symbolNames.get(j)+" : \""+tokensJavaCC.get(i)+"\" > | \n";
+        }
+        else
+        {
+            if(!tokensJavaCC.get(i).equals("\'"))
+               tokens+="< "+symbolNames.get(j)+" : \'"+tokensJavaCC.get(i)+"\' >";
+            else
+               tokens+="< "+symbolNames.get(j)+" : \""+tokensJavaCC.get(i)+"\" >";
+            
+        }
 
         j++;
       }
