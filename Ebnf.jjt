@@ -145,7 +145,7 @@ TOKEN :
 	< ASTERIX : "*">
 	|
 	< SYMBOL : <COMMA> | <EQUALS> | <OR> | <LPAREN> | <RPAREN> | <LBRACKET> | <RBRACKET> | <LBRACE> | <RBRACE> | <SEMICOLON> | <Q_MARK> | <S_QUOTE> |
-	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "Â´" | "~">
+	 <EXCEPTION> | <ASTERIX> | /*" " |*/ "." | ":" | "!" | "+" | "_" | "%" | "@" | "&" | "#" | "$" | "<" | ">" | "/" | "\\" | "^" | "`" | "´" | "~">
 	|
 	< CARACTER : <LETTER> | <DIGIT> | <SYMBOL> >
 	|
@@ -203,7 +203,7 @@ void Rhs() #Sequence: {Token t;}
 			| 
 			<COMMA> {jjtThis.value= ",";}
 			|
-			<EXCEPTION> 
+			<EXCEPTION> {jjtThis.value= "-";}
 		) 
 	Rhs1() 
 	)*
@@ -226,10 +226,8 @@ void Rhs1() #void: {Token t;}
 		{
 			jjtThis.value= ""+t.image.trim().replace(" ", "_");
 			matcher = patternQuotes.matcher(""+t.image);
-			System.out.println("VALOR DO TERMINAL:"+t.image+"!");
 			if(matcher.matches())
 			{
-				System.out.println("entrei no 1 match");
 				if(!SimpleNode.containsToken(matcher.group(1)))
 					SimpleNode.addToken(matcher.group(1));
 			}
@@ -238,7 +236,6 @@ void Rhs1() #void: {Token t;}
 				matcher = patternQuotationMarks.matcher(""+t.image);
 				if(matcher.matches())
 				{
-					System.out.println("entrei no 2 match");
 					if(!SimpleNode.containsToken(matcher.group(1)))
 						SimpleNode.addToken(matcher.group(1));
 				}
