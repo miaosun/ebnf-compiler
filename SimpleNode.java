@@ -40,7 +40,6 @@ class SimpleNode implements Node {
       //System.out.println("Matched: passei aqui a escrever : "+testStr);
       //testStr = testStr.trim().replace(" ", "_");
       //tokensJavaCC.add(testStr);
-      System.out.println("Not Matched: passei aqui a escrever : "+i);
       i = i.trim().replace(" ", "_");
       RandomString str = new RandomString(4);
       String string = str.nextString();
@@ -58,7 +57,6 @@ class SimpleNode implements Node {
       if(!symbolNames.contains(string))
         symbolNames.add(string);
       tokensJavaCC.add(testStr);*/
-      System.out.println("Matched: passei aqui a escrever : "+i);
       i = i.trim().replace(" ", "_");
       tokensJavaCC.add(i);
     }
@@ -153,7 +151,7 @@ class SimpleNode implements Node {
     System.out.println(toString(prefix));
     dump2(prefix +" ");
 
-    generateParser(writer,programName);
+    //generateParser(writer,programName);
   }
 
   public void startPrints(Writer writer) throws IOException
@@ -294,9 +292,9 @@ public void printSequence(Writer writer) throws IOException {
         printRule(writer);
         writer.write("\n");
         break;
-      case EbnfTreeConstants.JJTUNION :
+    /*  case EbnfTreeConstants.JJTUNION :
         printSequence(writer);
-        break;
+        break;*/
       case EbnfTreeConstants.JJTCONCAT :
         printSequence(writer);
         break;
