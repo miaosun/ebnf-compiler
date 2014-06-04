@@ -27,8 +27,6 @@ class SimpleNode implements Node {
   public String valor;
   public static ArrayList<String> identifiers = new ArrayList<String>();
   public static HashMap<String,String> mapTokensJavaCC = new HashMap<String,String>();
-  public static ArrayList<String> tokensJavaCC = new ArrayList<String>();
-  public static ArrayList<String> symbolNames = new ArrayList<String>();
 
   public static void addIdentifier(String i) {
     identifiers.add(i.trim().replace(" ", "_"));
@@ -43,11 +41,7 @@ class SimpleNode implements Node {
       i = i.trim().replace(" ", "_");
       RandomString str = new RandomString(4);
       String string = str.nextString();
-      if(!symbolNames.contains(string))
-        symbolNames.add(string);
-      tokensJavaCC.add(testStr);*/
       i = i.trim().replace(" ", "_");
-      tokensJavaCC.add(i);
       mapTokensJavaCC.put(i,string);
     }
     else
@@ -58,14 +52,12 @@ class SimpleNode implements Node {
       {
         numberFilter = "i"+i;
         i = i.trim().replace(" ", "_");
-        tokensJavaCC.add(i);
         String filterSymbols = i.replaceAll("[^a-zA-Z0-9\\s]","");
         mapTokensJavaCC.put(filterSymbols ,numberFilter);
       }
       else
       {
         i = i.trim().replace(" ", "_");
-        tokensJavaCC.add(i);
         String filterSymbols = i.replaceAll("[^a-zA-Z0-9\\s]","");
         mapTokensJavaCC.put(i,filterSymbols);
       }      
@@ -78,12 +70,7 @@ class SimpleNode implements Node {
     // System.out.print(identifiers.get(i)+" - ");    
   }
   public static void dumpTokens() {
-    System.out.print(tokensJavaCC);
-    //for(int i=0; i<identifiers.size(); i++) {
-    // System.out.print(identifiers.get(i)+" - ");    
-  }
-  public static void dumpNames() {
-    System.out.print(symbolNames);
+    System.out.print(mapTokensJavaCC);
     //for(int i=0; i<identifiers.size(); i++) {
     // System.out.print(identifiers.get(i)+" - ");    
   }
@@ -239,7 +226,7 @@ class SimpleNode implements Node {
   }
 
   public static boolean containsToken(String i){
-    return tokensJavaCC.contains(i);
+    return mapTokensJavaCC.containsValue(i);
   }
 
 
