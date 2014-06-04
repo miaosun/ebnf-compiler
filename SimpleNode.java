@@ -148,7 +148,7 @@ class SimpleNode implements Node {
     System.out.println(toString(prefix));
     dump2(prefix +" ");
 
-    //generateParser(writer,programName);
+    generateParser(writer,programName);
   }
 
   public void startPrints(Writer writer) throws IOException
@@ -236,13 +236,13 @@ class SimpleNode implements Node {
       System.exit(1);
     }
     SimpleNode n0 = (SimpleNode) children[0];
-    writer.write("void "+n0.jjtGetValue()+"() : \n { ");
+    writer.write("void "+n0.jjtGetValue()+"() : {} \n { ");
     SimpleNode n = (SimpleNode)children[1];
     n.printNode(writer);
     writer.write(" }");
   }
 
-public void printSequence(Writer writer) throws IOException {
+/*public void printSequence(Writer writer) throws IOException {
   for (int i = 0; i < children.length; i++) {
     SimpleNode ni = (SimpleNode) children[i];
     ni.printNode(writer);
@@ -253,12 +253,50 @@ public void printSequence(Writer writer) throws IOException {
         writer.write(" | ");
       }
       else
+      {
         if(this.value.equals(","))
           writer.write(" ");
+      }
     }
 
   }
-}
+}*/
+
+  public void printUnion(Writer writer) throws IOException {
+
+    for (int i = 0; i < children.length; i++) {
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
+      if(this.value != null && i < children.length-1 )
+           writer.write(" | ");
+    }
+  }
+
+  public void printConcat(Writer writer) throws IOException {
+
+    for (int i = 0; i < children.length; i++) {
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
+      if(this.value != null && i < children.length-1 )
+           writer.write(" ");
+    }
+  }
+
+  public void printException(Writer writer) throws IOException {
+     
+    //http://stackoverflow.com/questions/2966785/javacc-how-can-one-exclude-a-string-from-a-token-a-k-a-understanding-token-a
+
+    for (int i = 0; i < children.length; i++) 
+    {
+      if(i==1)
+        writer.write("~[");
+      SimpleNode ni = (SimpleNode) children[i];
+      ni.printNode(writer);
+
+    }
+    writer.write("] ");
+
+  }
 
   public void printRepetition(Writer writer) throws IOException {
     writer.write("( ");
@@ -300,14 +338,14 @@ public void printSequence(Writer writer) throws IOException {
         printRule(writer);
         writer.write("\n");
         break;
-    /*  case EbnfTreeConstants.JJTUNION :
-        printSequence(writer);
-        break;*/
+      case EbnfTreeConstants.JJTUNION :
+        printUnion(writer);
+        break;
       case EbnfTreeConstants.JJTCONCAT :
-        printSequence(writer);
+        printConcat(writer);
         break;
       case EbnfTreeConstants.JJTEXCEPT :
-        printSequence(writer);
+        printException(writer);
         break;
       case EbnfTreeConstants.JJTREPETITION :
         printRepetition(writer);
