@@ -56,7 +56,7 @@ public class Ebnf {
 			name = name.replace(".txt",".jj");
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
-			//root.dump("",writer,parser.getClass().getName());
+			root.dump("",writer,parser.getClass().getName());
 			SimpleNode.dumpIds();
 			SimpleNode.dumpTokens();
 			SimpleNode.dumpNames();
@@ -170,41 +170,40 @@ void SpecialSequence() : {}
 
 void Lhs() #RuleName: {Token t;}
 {
-	(t=<IDENTIFIER>{jjtThis.value= ""+t.image.trim().replace(" ", "_"); SimpleNode.addIdentifier(""+t.image);})+ // + necessario?
+	(t=<IDENTIFIER>{jjtThis.value= ""+t.image.trim().replace(" ", "_"); 
+	SimpleNode.addIdentifier(""+t.image);})+ // + necessario?
 }
-/*
-void Rhs() #void: {Token t;}
+
+void Rhs() #Union(>1): {Token t;}
 {
-	//TODO fIXME talvez separar em novas produÃ§Ãµes
-	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
-	Rhs1()  
-	((
+	Rhs2()  
+	(
 		(
-
+			//Test()
 			<OR> {jjtThis.value= "|";} 
-			| 
-			<COMMA> {jjtThis.value= ",";} 
-			|
-			<EXCEPTION>
 		) 
-	Rhs()) #Sequence(2) 
-	)? 
-}*/
+	Rhs2()
+	)* 
+}
 
-void Rhs() #Sequence: {Token t;}
+void Rhs2() #Concat(>1): {Token t;}
 {
-	//TODO fIXME talvez separar em novas produÃ§Ãµes
-	//	Rhs1() (( <OR> | <COMMA> ) Rhs())? 
+	Rhs3()  
+	(
+		(
+			<COMMA> {jjtThis.value= ",";} 
+		) 
+	Rhs3() 
+	)*
+}
+
+void Rhs3() #Except(>1): {Token t;}
+{
 	Rhs1()  
 	(
 		(
-
-			<OR> {jjtThis.value= "|";}
-			| 
-			<COMMA> {jjtThis.value= ",";}
-			|
-			<EXCEPTION> {jjtThis.value= "-";}
-		) 
+			<EXCEPTION> {jjtThis.value= ",";} 
+		)  
 	Rhs1() 
 	)*
 }

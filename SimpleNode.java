@@ -159,7 +159,7 @@ class SimpleNode implements Node {
     System.out.println(toString(prefix));
     dump2(prefix +" ");
 
-    generateParser(writer,programName);
+    //generateParser(writer,programName);
   }
 
   public void startPrints(Writer writer) throws IOException
@@ -311,7 +311,13 @@ public void printSequence(Writer writer) throws IOException {
         printRule(writer);
         writer.write("\n");
         break;
-      case EbnfTreeConstants.JJTSEQUENCE :
+      case EbnfTreeConstants.JJTUNION :
+        printSequence(writer);
+        break;
+      case EbnfTreeConstants.JJTCONCAT :
+        printSequence(writer);
+        break;
+      case EbnfTreeConstants.JJTEXCEPT :
         printSequence(writer);
         break;
       case EbnfTreeConstants.JJTREPETITION :
