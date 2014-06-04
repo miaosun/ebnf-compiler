@@ -45,6 +45,8 @@ class SimpleNode implements Node {
       String string = str.nextString();
       if(!symbolNames.contains(string))
         symbolNames.add(string);
+      tokensJavaCC.add(testStr);*/
+      i = i.trim().replace(" ", "_");
       tokensJavaCC.add(i);
       mapTokensJavaCC.put(i,string);
     }
@@ -311,9 +313,9 @@ public void printSequence(Writer writer) throws IOException {
         printRule(writer);
         writer.write("\n");
         break;
-      case EbnfTreeConstants.JJTUNION :
+    /*  case EbnfTreeConstants.JJTUNION :
         printSequence(writer);
-        break;
+        break;*/
       case EbnfTreeConstants.JJTCONCAT :
         printSequence(writer);
         break;
