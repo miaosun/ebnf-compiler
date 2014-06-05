@@ -528,6 +528,7 @@ class SimpleNode implements Node {
 		return null;
 	}
 
+	// TODO verify diferente situations
 	public String dotExcept() {
 		return addLabel(children[0]+"-"+children[1]);
 	}
@@ -542,14 +543,75 @@ class SimpleNode implements Node {
 		return null;
 	}
 
-	public ArrayList<String> dotConcat(Writer dwriter) {
-
+	public ArrayList<String> dotConcat(Writer dwriter) throws IOException {
+		ArrayList<String> res = new ArrayList<String>();
+		String anterior = null;
+		String actual = null;
 		for (int i = 0; i < children.length; ++i) {
-
+			SimpleNode n = (SimpleNode)children[i];
+			int id = n.jjtGetID();
+			
+			if(id==Ebnf.JJTTERMINAL || id==Ebnf.JJTIDENTIFIER) {
+				actual = ""+n.jjtGetValue();
+				if(i==0)
+				{
+					res.add(actual);
+					anterior = actual;
+				}
+				else if(i==children.length-1) {
+					res.add(actual);
+					dwriter.write(anterior + " -> " + actual);
+				}
+				else {
+					dwriter.write(anterior + " -> " + actual);
+					anterior = actual;
+				}
+			}
+			
+			if(id==Ebnf.JJTREPETITION || id==Ebnf.JJTGROUPING) {
+				ArrayList<String> ret;
+				if(id==Ebnf.JJTREPETITION)
+					ret = n.dotRepetition(dwriter);
+				else
+					ret = n.dotGrouping(dwriter);
+				
+				String primeiro = ret.get(0);
+				String ultimo = ret.get(1);
+				
+				if(i==0) {
+					res.add(primeiro);
+					anterior = primeiro;
+				}
+				else if (i==children.length-1){
+					res.add(ultimo);
+					dwriter.write(anterior + " -> " + primeiro+"\n");
+				}
+				else {
+					dwriter.write(anterior + " -> " + primeiro+"\n");
+					anterior = ultimo;
+				}
+			}
+			
+			if(id==Ebnf.JJTEXCEPT)
+			{
+				actual = n.dotExcept();
+				if(i==0)
+					res.add(actual);
+				else if(i==children.length-1)
+				{
+					res.add(actual);
+					dwriter.write(anterior + " -> " + actual);
+				}
+				else {
+					dwriter.write(anterior + " -> " + actual);
+					anterior = actual;
+				}
+			}			
 		}
-
-		return null;
+		return res;
 	}
+	
+	
 	/*
 public ArrayList<String> dotUnion() {
 
