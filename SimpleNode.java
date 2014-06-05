@@ -649,14 +649,24 @@ class SimpleNode implements Node {
 		
 	}
 	
-	private ArrayList<String> printUnion(ArrayList<String> inNodes,
-			Writer dwriter) {
-		// TODO Auto-generated method stub
-		return null;
+	private ArrayList<String> printUnion(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		ArrayList<String> res = new ArrayList<String>();
+		
+		for(int i=0; i<children.length-1; i++)
+		res.add(""+((SimpleNode)children[i]).jjtGetValue());
+		
+		for(String n : inNodes) {
+			for(int i=0; i<children.length-1; i++)
+			{
+				dwriter.write(n + " -> " + ((SimpleNode)children[i]).jjtGetValue() + ";\n");
+			}
+		}
+		
+		return res;
 	}
-	private ArrayList<String> printGrouping(ArrayList<String> inNodes,
-			Writer dwriter) {
-		// TODO Auto-generated method stub
+	private ArrayList<String> printGrouping(ArrayList<String> inNodes, Writer dwriter) {
+		
+		
 		return null;
 	}
 	
