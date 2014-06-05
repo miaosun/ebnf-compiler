@@ -629,18 +629,30 @@ class SimpleNode implements Node {
 		// buscar filho com a regra e chamar printNode nesse filho com inNodes initialNode
 		for(int i=0; i<children.length-1; i++)
 		{
-			returns = printNode(inNodes, dwriter);
+			ArrayList<String> nextInNodes = new ArrayList<String>();
+			SimpleNode rule = (SimpleNode)children[i];
+			dwriter.write("digraph " + rule.children[0] + " {\n");
+			
+			int ruleID = ((SimpleNode)rule.children[1]).jjtGetID();
+			
+			if(ruleID == Ebnf.TERMINAL || ruleID == Ebnf.IDENTIFIER)
+				returns = printNode(inNodes, dwriter);
+			else
+			{
+				nextInNodes = printNode(inNodes, dwriter);
+				while(ruleID != Ebnf.TERMINAL || ruleID != Ebnf.IDENTIFIER)
+					returns = printNode(nextInNodes, dwriter);
+			}
 			
 			for(String ret : returns)
 			{
 				dwriter.write(ret + " -> " + endNode);
 			}
 			returns.clear();
+			nextInNodes.clear();
 		}
-		
-		
+
 		// Para cada nó retornada no printNode, fazer print desse a ligar ao endNode;
-		
 	}
 	
 	
