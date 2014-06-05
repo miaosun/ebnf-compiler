@@ -538,6 +538,10 @@ class SimpleNode implements Node {
 		ArrayList<String> anteriores = new ArrayList<String>();
 		String actual = null;
 		
+		for(int i=0; i<children.length; i++) {
+			
+		}
+		
 		
 		
 		return null;
@@ -609,6 +613,56 @@ class SimpleNode implements Node {
 			}			
 		}
 		return res;
+	}
+	
+	
+	public void printRule() {
+		
+		String initialNode = "Start";
+		
+		// buscar filho com a regra e chamar printNode nesse filho com inNodes initialNode
+		
+		String endNode = "End";
+		// Para cada nó retornada no printNode, fazer print desse a ligar ao endNode;
+		
+	}
+	
+	
+	public ArrayList<String> printNode(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		
+		switch(id) {
+		case Ebnf.JJTTERMINAL:
+		case Ebnf.JJTIDENTIFIER:
+			return printTerminal(inNodes, dwriter);
+		
+		case Ebnf.JJTCONCAT:
+			return printConcat(inNodes, dwriter);
+			// ....
+		}
+		
+		return null;
+		
+	}
+	
+	private ArrayList<String> printConcat(ArrayList<String> inNodes, Writer dwriter) {
+		ArrayList<String> returns = new ArrayList<String>();
+		
+		
+		
+		
+		return returns;
+	}
+	
+	
+	private ArrayList<String> printTerminal(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		ArrayList<String> returns = new ArrayList<String>();
+		returns.add(""+value);
+		
+		for(String n : inNodes) {
+			dwriter.write(n + " -> " + value + ";\n");
+		}
+		
+		return returns;
 	}
 	
 	
