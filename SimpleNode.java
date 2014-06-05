@@ -638,6 +638,8 @@ class SimpleNode implements Node {
 		
 		ArrayList<String> returns = new ArrayList<String>();
 		
+		returns = printNode(inNodes, dwriter);
+		/*
 		int ruleContentID = ruleContent.jjtGetID();
 		
 		if(ruleContentID == Ebnf.TERMINAL || ruleContentID == Ebnf.IDENTIFIER)
@@ -652,7 +654,7 @@ class SimpleNode implements Node {
 				printRuleDotty((SimpleNode)ruleContent.children[i], dwriter);
 			}
 		}
-		
+		*/
 		for(String ret : returns)
 		{
 			dwriter.write(ret + " -> " + endNode);
@@ -731,10 +733,15 @@ class SimpleNode implements Node {
 		ArrayList<String> res = new ArrayList<String>();
 		res.add(""+((SimpleNode)children[children.length-1]).jjtGetValue());
 		
+		ArrayList<String> in = inNodes;
+		/*
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
+		}*/
+		for(int i=0; i<children.length;i++) {
+			in = ((SimpleNode) children[i]).printNode(in, dwriter);
 		}
-		
+		/*
 		if(children.length >= 2)
 		{
 			for(int i=0; i<children.length-1; i++)
@@ -742,19 +749,19 @@ class SimpleNode implements Node {
 				dwriter.write(((SimpleNode)children[i]).jjtGetValue() + " -> " +((SimpleNode)children[i+1]).jjtGetValue());
 			}
 		}
-		
+		*/
 		return res;
 	}
 	
 	
 	private ArrayList<String> printTerminal(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
-		res.add(""+value);
+		String value = ""+jjtGetValue();
+		res.add(value);
 		
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + value + ";\n");
 		}
-		
 		return res;
 	}
 	
