@@ -53,7 +53,7 @@ public class Ebnf {
 		}
 		try {
 			String name = ""+args[0];
-			name = name.replace(".txt",".jj");
+			name = name.replace(".txt",".jjt");
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
@@ -170,7 +170,8 @@ void SpecialSequence() : {}
 void Lhs() #RuleName: {Token t;}
 {
 	(t=<IDENTIFIER>{jjtThis.value= ""+t.image.trim().replace(" ", "_"); 
-	SimpleNode.addIdentifier(""+t.image);})+ // + necessario?
+	SimpleNode.addIdentifier(""+t.image);})+
+
 }
 
 void Rhs() #Union(>1): {Token t;}
@@ -182,7 +183,7 @@ void Rhs() #Union(>1): {Token t;}
 			<OR> {jjtThis.value= "|";} 
 		) 
 	Rhs2()
-	)* 
+	)* //{return true;}
 }
 
 void Rhs2() #Concat(>1): {Token t;}
@@ -201,7 +202,7 @@ void Rhs3() #Except(>1): {Token t;}
 	Rhs1()  
 	(
 		(
-			<EXCEPTION> {jjtThis.value= ",";} 
+			<EXCEPTION> {jjtThis.value= "-";} 
 		)  
 	Rhs1() 
 	)*
@@ -258,6 +259,7 @@ void Rule() #Rule: {Token t1;}
 	Rhs() 
 	<SEMICOLON>
 	*/
+	//LOOKAHEAD({Rhs() == true})
 	Lhs() t1=<EQUALS> Rhs() <SEMICOLON>
 }
 

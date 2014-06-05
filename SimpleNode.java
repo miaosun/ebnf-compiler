@@ -17,6 +17,12 @@ import java.util.Iterator;
 public
 class SimpleNode implements Node {
 
+  //Arraylist of nodes to store exception extra rules
+  public static ArrayList<SimpleNode> exceptionNodes = new ArrayList<SimpleNode>();
+
+  public static ArrayList<SimpleNode> ruleNodes = new ArrayList<SimpleNode>();
+
+
   protected Node parent;
   protected Node[] children;
   protected int id;
@@ -27,6 +33,7 @@ class SimpleNode implements Node {
   public String valor;
   public static ArrayList<String> identifiers = new ArrayList<String>();
   public static HashMap<String,String> mapTokensJavaCC = new HashMap<String,String>();
+  static int cardinalToken = 0;
 
   public static void addIdentifier(String i) {
     identifiers.add(i.trim().replace(" ", "_"));
@@ -148,8 +155,44 @@ class SimpleNode implements Node {
     System.out.println(toString(prefix));
     dump2(prefix +" ");
 
+    getRulesAndExtraExceptions();
+
     generateParser(writer,programName);
   }
+
+    public void getRulesAndExtraExceptions()
+    {
+        for (int i = 0; i < children.length; i++) 
+        {
+            SimpleNode n = (SimpleNode)children[i];
+            if (n != null) 
+            {
+                n.checkIfAdd();  
+            }
+        }
+    }
+
+    public void checkIfAdd()
+    {
+      if(this.id == EbnfTreeConstants.JJTRULE)
+        ruleNodes.add((SimpleNode) this.children[0]);
+      else if(this.id == EbnfTreeConstants.JJTEXCEPT)
+        exceptionNodes.add(this);
+
+      if(children != null)
+      {
+
+        for (int i = 0; i < children.length; i++) 
+          {
+              SimpleNode n = (SimpleNode)children[i];
+              if (n != null) 
+              {
+                  n.checkIfAdd();  
+              }
+          }
+      }
+          
+    }
 
   public void startPrints(Writer writer) throws IOException
   {
@@ -157,6 +200,21 @@ class SimpleNode implements Node {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
           n.printNode(writer);
+        }
+      }
+  }
+
+  public void printExtraRules(Writer writer) throws IOException
+  {
+    SimpleNode child1;
+    SimpleNode child2;
+
+    for (int i = 0; i < exceptionNodes.size() ; i++) {
+        SimpleNode n = exceptionNodes.get(i);
+        if (n != null) {
+          writer.write("void "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+"_except_"+(i+1)+"() : {} \n { ");
+          writer.write("     //TODO: redefine token on token list with "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+" except "+((SimpleNode) n.jjtGetChild(1)).jjtGetValue()+"\n");
+          writer.write("     // <insert_token_name_here> and after insert the token and its definition on the token list up!\n }");
         }
       }
   }
@@ -180,11 +238,16 @@ class SimpleNode implements Node {
 
   public void generateParser(Writer writer, String name) throws IOException {
     writer.write("PARSER_BEGIN("+name+")\n");
-    writer.write("class "+name+" { }\n");
+    writer.write("class "+name+" { \n public static void main(String args[]) throws ParseException { \n ");
+    writer.write(name+" parser = new "+name+"(System.in);\n");
+    writer.write("SimpleNode root =parser.");
+    writer.write(((SimpleNode) ruleNodes.get(0)).jjtGetValue()+"(); \n ");
+    writer.write("root.dump(\"\"); \n } \n }\n");
     writer.write("PARSER_END("+name+")\n");
     writer.write("SKIP : { \" \" | \"\\t\" | \"\\r\" | \"\\n\" }\n");
     writer.write("TOKEN : \n{\n "+getTokens()+"\n}\n");
     startPrints(writer);
+    printExtraRules(writer);
   }
 
   public String getTokens()
@@ -202,12 +265,12 @@ class SimpleNode implements Node {
         {
           if(pairs.getKey().equals("\'") || pairs.getKey().equals("\""))
               tokens+="< "+pairs.getValue()+" : \"\\"+pairs.getKey()+"\" > | \n";
-            else
+          else
               tokens+="< "+pairs.getValue()+" : \""+pairs.getKey()+"\" > | \n";
         }
         else
         {
-            if(!pairs.getKey().equals("\'"))
+            if(pairs.getKey().equals("\'") || pairs.getKey().equals("\""))
                tokens+="< "+pairs.getValue()+" : \"\\"+pairs.getKey()+"\" >";
             else
                tokens+="< "+pairs.getValue()+" : \""+pairs.getKey()+"\" >";
@@ -222,6 +285,7 @@ class SimpleNode implements Node {
           tokens+="< "+pairs.getValue()+" : \""+pairs.getKey()+"\" >";
       }      
     }
+
     return tokens;
   }
 
@@ -235,32 +299,41 @@ class SimpleNode implements Node {
       System.out.println("ERROR");
       System.exit(1);
     }
+    cardinalToken =1;
     SimpleNode n0 = (SimpleNode) children[0];
-    writer.write("void "+n0.jjtGetValue()+"() : {} \n { ");
     SimpleNode n = (SimpleNode)children[1];
+    String insertTokens=n.getNumberTokens();
+    writer.write("void "+n0.jjtGetValue()+"() #"+n0.jjtGetValue()+" : {"+insertTokens+"} \n { ");
+    
     n.printNode(writer);
     writer.write(" }");
   }
 
-/*public void printSequence(Writer writer) throws IOException {
-  for (int i = 0; i < children.length; i++) {
-    SimpleNode ni = (SimpleNode) children[i];
-    ni.printNode(writer);
-    if(this.value != null && i < children.length-1 )
-    {
-      if(this.value.equals("|"))
-      {
-        writer.write(" | ");
-      }
-      else
-      {
-        if(this.value.equals(","))
-          writer.write(" ");
-      }
-    }
+  public String getNumberTokens()
+  {
+      String tmp = "";
 
+      int count = 1 ;
+      if(children != null)
+      {
+        for(int i = 0 ; i < children.length ; i++)
+        {
+            SimpleNode ni = (SimpleNode) children[i];
+            if(ni.id == EbnfTreeConstants.JJTTERMINAL)
+            {
+              if(count > 1)
+                tmp+=", t"+count;
+              else
+                tmp+="Token t"+count;
+
+              count++;
+            }
+        }
+        tmp+=";";
+        return tmp;
+      }
+      return "";     
   }
-}*/
 
   public void printUnion(Writer writer) throws IOException {
 
@@ -283,20 +356,10 @@ class SimpleNode implements Node {
   }
 
   public void printException(Writer writer) throws IOException {
-     
-    //http://stackoverflow.com/questions/2966785/javacc-how-can-one-exclude-a-string-from-a-token-a-k-a-understanding-token-a
+    SimpleNode child1 = (SimpleNode) children[0];
 
-    for (int i = 0; i < children.length; i++) 
-    {
-      if(i==1)
-        writer.write("~[");
-      SimpleNode ni = (SimpleNode) children[i];
-      ni.printNode(writer);
-
-    }
-    writer.write("] ");
-
-  }
+    writer.write(""+child1.jjtGetValue()+"_except_"+exceptionNodes.size()+"()");
+}
 
   public void printRepetition(Writer writer) throws IOException {
     writer.write("( ");
@@ -358,7 +421,8 @@ class SimpleNode implements Node {
         String filtered = terminal.substring(1,terminal.length()-1);
         if(mapTokensJavaCC.containsKey(filtered))   
         {
-          writer.write("<"+mapTokensJavaCC.get(filtered)+">");
+          writer.write("t"+cardinalToken+"=<"+mapTokensJavaCC.get(filtered)+"> { jjtThis.value= \"\"+t"+cardinalToken+".image;}");
+          cardinalToken++;
         }
        // terminal = terminal.replaceAll("[^a-zA-Z0-9\\s]","");
         
