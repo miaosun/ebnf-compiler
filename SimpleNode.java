@@ -27,11 +27,11 @@ class SimpleNode implements Node {
 	public String valor;
 	public static ArrayList<String> identifiers = new ArrayList<String>();
 	public static HashMap<String,String> mapTokensJavaCC = new HashMap<String,String>();
-	
+
 	//for dotty
 	private static HashMap<String, String> labels = new HashMap<String,String>();
 	private static int labelsCounter=0;
-	
+
 	private static String getNextLabel() {
 		return "n"+labelsCounter++;
 	}
@@ -364,7 +364,7 @@ class SimpleNode implements Node {
 	public ArrayList<String> generateDotty(Writer dwriter) throws IOException {
 
 		if(this.id == EbnfTreeConstants.JJTRULE) {
-			labels.clear();
+			resetLabelsMap();
 			SimpleNode start = new SimpleNode(-1);
 			for (int i = 0; i < children.length; ++i) {
 				SimpleNode n = (SimpleNode)children[i];
@@ -453,12 +453,14 @@ class SimpleNode implements Node {
 					anteriores.add(actual); //anterior
 				}
 			}
-			else if(id == Ebnf.JJTCONCAT || id == Ebnf.JJTREPETITION) {
+			else if(id == Ebnf.JJTCONCAT || id == Ebnf.JJTREPETITION || id == Ebnf.JJTGROUPING) {
 				ArrayList<String> ret;
 				if(id == Ebnf.JJTCONCAT)
 					ret = n.dotConcat(dwriter);
-				else
+				else if(id == Ebnf.JJTREPETITION)
 					ret = n.dotRepetition(dwriter);
+				else
+					ret = n.dotGrouping(dwriter);
 
 				String primeiro = ret.get(0);
 				String ultimo = ret.get(1);
@@ -480,12 +482,9 @@ class SimpleNode implements Node {
 					anteriores.add(ultimo);
 				}
 			}
-			else if (id == Ebnf.JJTGROUPING || id == Ebnf.JJTUNION){
+			else if (id == Ebnf.JJTUNION){
 				ArrayList<String>[] u;
-				if(id == Ebnf.JJTGROUPING) 
-					u = n.dotGrouping(dwriter);
-				else
-					u = n.dotUnion(dwriter);
+				u = n.dotUnion(dwriter);
 
 				ArrayList<String> uant = u[0];
 				ArrayList<String> useg = u[1];
@@ -533,8 +532,13 @@ class SimpleNode implements Node {
 		return children[0]+"-"+children[1];
 	}
 
-	public ArrayList<String>[] dotGrouping(Writer dwriter) {
-		// TODO Auto-generated method stub
+	public ArrayList<String> dotGrouping(Writer dwriter) {
+		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> anteriores = new ArrayList<String>();
+		String actual = null;
+		
+		
+		
 		return null;
 	}
 
