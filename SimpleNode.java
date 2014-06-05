@@ -529,7 +529,7 @@ class SimpleNode implements Node {
 	}
 
 	public String dotExcept() {
-		return children[0]+"-"+children[1];
+		return addLabel(children[0]+"-"+children[1]);
 	}
 
 	public ArrayList<String> dotGrouping(Writer dwriter) {
