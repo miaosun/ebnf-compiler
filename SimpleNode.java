@@ -640,7 +640,7 @@ class SimpleNode implements Node {
 			else
 			{
 				nextInNodes = printNode(inNodes, dwriter);
-				while(ruleID != Ebnf.TERMINAL || ruleID != Ebnf.IDENTIFIER)
+				while(ruleID != Ebnf.TERMINAL && ruleID != Ebnf.IDENTIFIER)
 					returns = printNode(nextInNodes, dwriter);
 			}
 			
