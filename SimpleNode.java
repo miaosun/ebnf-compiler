@@ -616,7 +616,19 @@ class SimpleNode implements Node {
 	}
 	
 	
-	public void printRuleDotty(Writer dwriter) throws IOException {
+	public void printRuesDotty(Writer dwriter) throws IOException {
+		
+		for(int i=0; i<children.length-1; i++)
+		{
+			SimpleNode rule = (SimpleNode)children[i];
+			dwriter.write("digraph " + rule.children[0] + " {\n");
+			
+			printRuleDotty((SimpleNode)rule.children[1], dwriter);
+		}
+	}
+	
+	
+	public void printRuleDotty(SimpleNode ruleContent, Writer dwriter) throws IOException {
 		
 		ArrayList<String> inNodes = new ArrayList<String>();
 		String initialNode = "Start";
@@ -626,31 +638,28 @@ class SimpleNode implements Node {
 		
 		ArrayList<String> returns = new ArrayList<String>();
 		
-		// buscar filho com a regra e chamar printNode nesse filho com inNodes initialNode
-		for(int i=0; i<children.length-1; i++)
+		int ruleContentID = ruleContent.jjtGetID();
+		
+		if(ruleContentID == Ebnf.TERMINAL || ruleContentID == Ebnf.IDENTIFIER)
 		{
-			ArrayList<String> nextInNodes = new ArrayList<String>();
-			SimpleNode rule = (SimpleNode)children[i];
-			dwriter.write("digraph " + rule.children[0] + " {\n");
-			
-			int ruleID = ((SimpleNode)rule.children[1]).jjtGetID();
-			
-			if(ruleID == Ebnf.TERMINAL || ruleID == Ebnf.IDENTIFIER)
-				returns = printNode(inNodes, dwriter);
-			else
-			{
-				nextInNodes = printNode(inNodes, dwriter);
-				while(ruleID != Ebnf.TERMINAL && ruleID != Ebnf.IDENTIFIER)
-					returns = printNode(nextInNodes, dwriter);
-			}
-			
-			for(String ret : returns)
-			{
-				dwriter.write(ret + " -> " + endNode);
-			}
-			returns.clear();
-			nextInNodes.clear();
+			returns = printNode(inNodes, dwriter);
 		}
+		
+		while(ruleContentID != Ebnf.TERMINAL && ruleContentID != Ebnf.IDENTIFIER)
+		{
+			for(int i=0; i<ruleContent.children.length-1; i++)
+			{
+				printRuleDotty((SimpleNode)ruleContent.children[i], dwriter);
+			}
+		}
+		
+		for(String ret : returns)
+		{
+			dwriter.write(ret + " -> " + endNode);
+		}
+
+		
+		// buscar filho com a regra e chamar printNode nesse filho com inNodes initialNode
 
 		// Para cada nó retornada no printNode, fazer print desse a ligar ao endNode;
 	}
