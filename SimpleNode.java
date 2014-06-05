@@ -644,25 +644,27 @@ class SimpleNode implements Node {
 		
 	}
 	
-	private ArrayList<String> printConcat(ArrayList<String> inNodes, Writer dwriter) {
-		ArrayList<String> returns = new ArrayList<String>();
+	private ArrayList<String> printConcat(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(""+((SimpleNode)children[children.length-1]).jjtGetValue());
 		
+		for(String n : inNodes) {
+			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
+		}
 		
-		
-		
-		return returns;
+		return res;
 	}
 	
 	
 	private ArrayList<String> printTerminal(ArrayList<String> inNodes, Writer dwriter) throws IOException {
-		ArrayList<String> returns = new ArrayList<String>();
-		returns.add(""+value);
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(""+value);
 		
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + value + ";\n");
 		}
 		
-		return returns;
+		return res;
 	}
 	
 	
