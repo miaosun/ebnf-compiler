@@ -425,13 +425,13 @@ class SimpleNode implements Node {
 				{
 					res.add(actual);
 					for(String ant : anterior)
-						dwriter.write(ant + " -> " + actual);
-					dwriter.write(actual + " -> " + res.get(0));
+						dwriter.write(ant + " -> " + actual+"\n");
+					dwriter.write(actual + " -> " + res.get(0)+"\n");
 				}
 				else
 				{
 					for(String ant : anterior)
-						dwriter.write(ant + " -> " + actual);
+						dwriter.write(ant + " -> " + actual+"\n");
 					anterior.clear();
 					anterior.add(actual);
 				}
@@ -453,11 +453,11 @@ class SimpleNode implements Node {
 				else if (i==children.length-1){
 					res.add(ultimo);
 					for(String ant : anterior)
-						dwriter.write(ant + " -> " + primeiro);
+						dwriter.write(ant + " -> " + primeiro+"\n");
 				}
 				else {
 					for(String ant : anterior)
-						dwriter.write(ant + " -> " + primeiro);
+						dwriter.write(ant + " -> " + primeiro+"\n");
 					anterior.clear();
 					anterior.add(ultimo);
 				}
@@ -469,7 +469,7 @@ class SimpleNode implements Node {
 			else if (id == Ebnf.JJTEXCEPT) {
 				String ret = n.dotExcept();
 				for(String ant : anterior)
-					dwriter.write(ant + " -> " + ret);
+					dwriter.write(ant + " -> " + ret+"\n");
 				anterior.clear();
 				anterior.add(ret);
 			}
@@ -478,7 +478,7 @@ class SimpleNode implements Node {
 				int nr_elementos = ret.size();
 				for(int j=0; j<nr_elementos;j++) {
 					for(String ant : anterior)
-						dwriter.write(ant + " -> " + ret.get(j));
+						dwriter.write(ant + " -> " + ret.get(j)+"\n");
 				}
 			}
 		}
