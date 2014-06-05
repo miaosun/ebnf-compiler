@@ -634,14 +634,50 @@ class SimpleNode implements Node {
 		case Ebnf.JJTTERMINAL:
 		case Ebnf.JJTIDENTIFIER:
 			return printTerminal(inNodes, dwriter);
-		
 		case Ebnf.JJTCONCAT:
 			return printConcat(inNodes, dwriter);
+		case Ebnf.JJTREPETITION:
+			return printRepetition(inNodes, dwriter);
+		case Ebnf.JJTGROUPING:
+			return printGrouping(inNodes, dwriter);
+		case Ebnf.JJTUNION:
+			return printUnion(inNodes, dwriter);
 			// ....
 		}
 		
 		return null;
 		
+	}
+	
+	private ArrayList<String> printUnion(ArrayList<String> inNodes,
+			Writer dwriter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	private ArrayList<String> printGrouping(ArrayList<String> inNodes,
+			Writer dwriter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private ArrayList<String> printRepetition(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(""+((SimpleNode)children[children.length-1]).jjtGetValue());
+		
+		for(String n : inNodes) {
+			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
+		}
+		
+		if(children.length >= 2)
+		{
+			for(int i=0; i<children.length-1; i++)
+			{
+				dwriter.write(((SimpleNode)children[i]).jjtGetValue() + " -> " +((SimpleNode)children[i+1]).jjtGetValue());
+			}
+			dwriter.write(((SimpleNode)children[children.length-1]).jjtGetValue() + " -> " +((SimpleNode)children[0]).jjtGetValue());
+		}
+		
+		return res;
 	}
 	
 	private ArrayList<String> printConcat(ArrayList<String> inNodes, Writer dwriter) throws IOException {
@@ -650,6 +686,14 @@ class SimpleNode implements Node {
 		
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
+		}
+		
+		if(children.length >= 2)
+		{
+			for(int i=0; i<children.length-1; i++)
+			{
+				dwriter.write(((SimpleNode)children[i]).jjtGetValue() + " -> " +((SimpleNode)children[i+1]).jjtGetValue());
+			}
 		}
 		
 		return res;
