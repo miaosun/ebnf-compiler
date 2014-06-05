@@ -406,7 +406,7 @@ class SimpleNode implements Node {
 
 	public ArrayList<String> dotRepetition(Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
-		ArrayList<String> anterior = new ArrayList<String>();
+		ArrayList<String> anteriores = new ArrayList<String>();
 		String actual = null;
 
 		for (int i = 0; i < children.length; ++i) {
@@ -417,23 +417,23 @@ class SimpleNode implements Node {
 				actual = ""+n.jjtGetValue();
 				if(i==0)
 				{
-					res.add(actual);
-					anterior.clear();
-					anterior.add(actual);
+					res.add(actual); //primeiro res
+					anteriores.clear();
+					anteriores.add(actual); //anterior
 				}
 				else if(i==children.length-1)
 				{
-					res.add(actual);
-					for(String ant : anterior)
+					res.add(actual); //ultimo res
+					for(String ant : anteriores)
 						dwriter.write(ant + " -> " + actual+"\n");
 					dwriter.write(actual + " -> " + res.get(0)+"\n");
 				}
 				else
 				{
-					for(String ant : anterior)
+					for(String ant : anteriores)
 						dwriter.write(ant + " -> " + actual+"\n");
-					anterior.clear();
-					anterior.add(actual);
+					anteriores.clear();
+					anteriores.add(actual); //anterior
 				}
 			}
 			else if(id == Ebnf.JJTCONCAT || id == Ebnf.JJTREPETITION) {
@@ -446,20 +446,21 @@ class SimpleNode implements Node {
 				String primeiro = ret.get(0);
 				String ultimo = ret.get(1);
 				if(i==0) {
-					anterior.clear();
-					anterior.add(ultimo);
+					anteriores.clear();
+					anteriores.add(ultimo);
 					res.add(primeiro);
 				}
 				else if (i==children.length-1){
 					res.add(ultimo);
-					for(String ant : anterior)
+					for(String ant : anteriores)
 						dwriter.write(ant + " -> " + primeiro+"\n");
+					dwriter.write(ultimo + " -> " + res.get(0)+"\n");
 				}
 				else {
-					for(String ant : anterior)
+					for(String ant : anteriores)
 						dwriter.write(ant + " -> " + primeiro+"\n");
-					anterior.clear();
-					anterior.add(ultimo);
+					anteriores.clear();
+					anteriores.add(ultimo);
 				}
 			}
 			else if (id == Ebnf.JJTGROUPING){
@@ -468,23 +469,47 @@ class SimpleNode implements Node {
 			}
 			else if (id == Ebnf.JJTEXCEPT) {
 				String ret = n.dotExcept();
-				for(String ant : anterior)
+				for(String ant : anteriores)
 					dwriter.write(ant + " -> " + ret+"\n");
-				anterior.clear();
-				anterior.add(ret);
+				anteriores.clear();
+				anteriores.add(ret);
 			}
 			else if(id == Ebnf.JJTUNION) {
-				ArrayList<String> ret = n.dotGrouping(dwriter);
-				int nr_elementos = ret.size();
-				for(int j=0; j<nr_elementos;j++) {
-					for(String ant : anterior)
-						dwriter.write(ant + " -> " + ret.get(j)+"\n");
+				ArrayList<String>[] u = n.dotUnion(dwriter);
+				ArrayList<String> uant = u[0];
+				ArrayList<String> useg = u[1];
+
+				if(i==0) {
+					res.addAll(uant);
+					anteriores = useg;
+				}
+				else if(i==children.length-1) {
+					for(String a : anteriores) {
+						for(String ua : uant)
+							dwriter.write(a + " -> " + ua+"\n");
+					}
+					for(String a : anteriores) {
+						for(String ua : uant)
+							dwriter.write(a + " -> " + ua+"\n");
+					}
+					anteriores = useg;
+				}
+				else {
+					for(String a : anteriores) {
+						for(String ua : uant)
+							dwriter.write(a + " -> " + ua+"\n");
+					}
 				}
 			}
 		}
 		return res;
 	}
 
+
+	private ArrayList<String>[] dotUnion(Writer dwriter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	public String dotExcept() {
 		return children[0]+"-"+children[1];
