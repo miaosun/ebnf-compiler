@@ -616,13 +616,29 @@ class SimpleNode implements Node {
 	}
 	
 	
-	public void printRule() {
+	public void printRuleDotty(Writer dwriter) throws IOException {
 		
+		ArrayList<String> inNodes = new ArrayList<String>();
 		String initialNode = "Start";
+		inNodes.add(initialNode);
+
+		String endNode = "End";
+		
+		ArrayList<String> returns = new ArrayList<String>();
 		
 		// buscar filho com a regra e chamar printNode nesse filho com inNodes initialNode
+		for(int i=0; i<children.length-1; i++)
+		{
+			returns = printNode(inNodes, dwriter);
+			
+			for(String ret : returns)
+			{
+				dwriter.write(ret + " -> " + endNode);
+			}
+			returns.clear();
+		}
 		
-		String endNode = "End";
+		
 		// Para cada nó retornada no printNode, fazer print desse a ligar ao endNode;
 		
 	}
