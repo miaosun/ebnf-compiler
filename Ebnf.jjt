@@ -54,9 +54,11 @@ public class Ebnf {
 		}
 		try {
 			String name = ""+args[0];
+			namedot = name.replace(".txt",".dot");
 			name = name.replace(".txt",".jj");
+			
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
-			dottyWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Dotty"+name), "utf-8"));
+			dottyWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Dotty"+namedot), "utf-8"));
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
 			root.generateDotty(dottyWriter);

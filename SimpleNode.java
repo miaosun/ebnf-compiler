@@ -408,12 +408,46 @@ class SimpleNode implements Node {
 		ArrayList<String> res = new ArrayList<String>();
 		String anterior = null;
 		String actual = null;
-		
+
 		for (int i = 0; i < children.length; ++i) {
 			SimpleNode n = (SimpleNode)children[i];
 			int id = n.jjtGetID();
+			
 			if(n.jjtGetID()==Ebnf.JJTTERMINAL || n.jjtGetID()==Ebnf.JJTIDENTIFIER){
 				actual = ""+n.jjtGetValue();
+				if(i==0)
+				{
+					res.add(actual);
+					anterior = actual;
+				}
+				else if(i==children.length-1)
+				{
+					res.add(actual);
+					dwriter.write(anterior + " -> " + actual);
+					dwriter.write(actual + " -> " + res.get(0));
+				}
+				else
+				{
+					dwriter.write(anterior + " -> " + actual);
+					anterior = actual;
+				}
+			}
+			else if(id == Ebnf.JJTCONCAT) {
+				ArrayList<String> ret = n.dotConcat(dwriter);
+				String primeiro = ret.get(0);
+				String ultimo = ret.get(1);
+				if(i==0) {
+					anterior=ultimo;
+					res.add(primeiro);
+				}
+				else if (i==children.length-1){
+					res.add(ultimo);
+					dwriter.write(anterior + " -> " + primeiro);
+				}
+				else {
+					dwriter.write(anterior + " -> " + primeiro);
+					anterior=ultimo;
+				}
 			}
 			else if(id == Ebnf.JJTREPETITION ){
 				ArrayList<String> ret = n.dotRepetition(dwriter);
@@ -432,48 +466,48 @@ class SimpleNode implements Node {
 					anterior=ultimo;
 				}
 			}
-			else if (id == Ebnf.JJTUNION){
+			else if (id == Ebnf.JJTGROUPING){
+				ArrayList<String> ret = n.dotGrouping(dwriter);
 				
 			}
-			
-			if(i==0)
-			{
-				res.add(""+n.jjtGetValue());
-				anterior = ""+n.jjtGetValue();
+			else if (id == Ebnf.JJTEXCEPT) {
+				String ret = n.dotExcept();
+				dwriter.write(anterior + " -> " + ret);
+				anterior = ret;
 			}
-			else if(i==children.length-1)
-			{
-				res.add(""+n.jjtGetValue());
-				dwriter.write(anterior + " -> " + n.jjtGetValue());
-				dwriter.write(n.jjtGetValue() + " -> " + res.get(0));
-			}
-			else
-			{
-				dwriter.write(anterior + " -> " + n.jjtGetValue());
-				anterior = ""+n.jjtGetValue();
-			}
+
+
 		}
 		return res;
 	}
-	
-	
-		public ArrayList<String> dotConcat() {
 
-			for (int i = 0; i < children.length; ++i) {
 
-			}
+	public String dotExcept() {
+		return children[0]+"-"+children[1];
+	}
 
-			return null;
+	public ArrayList<String> dotGrouping(Writer dwriter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ArrayList<String> dotConcat(Writer dwriter) {
+
+		for (int i = 0; i < children.length; ++i) {
+
 		}
-		/*
+
+		return null;
+	}
+	/*
 public ArrayList<String> dotUnion() {
 
 
 	return null;
 }
-		 */
+	 */
 
 
 
-	}
-	/* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */
+}
+/* JavaCC - OriginalChecksum=2edd50316e282230d4638a37fa816c17 (do not edit this line) */
