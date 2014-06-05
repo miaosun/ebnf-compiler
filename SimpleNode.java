@@ -406,77 +406,81 @@ class SimpleNode implements Node {
 
 	public ArrayList<String> dotRepetition(Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
-		String anterior = null;
+		ArrayList<String> anterior = new ArrayList<String>();
 		String actual = null;
 
 		for (int i = 0; i < children.length; ++i) {
 			SimpleNode n = (SimpleNode)children[i];
 			int id = n.jjtGetID();
-			
+
 			if(n.jjtGetID()==Ebnf.JJTTERMINAL || n.jjtGetID()==Ebnf.JJTIDENTIFIER){
 				actual = ""+n.jjtGetValue();
 				if(i==0)
 				{
 					res.add(actual);
-					anterior = actual;
+					anterior.clear();
+					anterior.add(actual);
 				}
 				else if(i==children.length-1)
 				{
 					res.add(actual);
-					dwriter.write(anterior + " -> " + actual);
+					for(String ant : anterior)
+						dwriter.write(ant + " -> " + actual);
 					dwriter.write(actual + " -> " + res.get(0));
 				}
 				else
 				{
-					dwriter.write(anterior + " -> " + actual);
-					anterior = actual;
+					for(String ant : anterior)
+						dwriter.write(ant + " -> " + actual);
+					anterior.clear();
+					anterior.add(actual);
 				}
 			}
-			else if(id == Ebnf.JJTCONCAT) {
-				ArrayList<String> ret = n.dotConcat(dwriter);
+			else if(id == Ebnf.JJTCONCAT || id == Ebnf.JJTREPETITION) {
+				ArrayList<String> ret;
+				if(id == Ebnf.JJTCONCAT)
+					ret = n.dotConcat(dwriter);
+				else
+					ret = n.dotRepetition(dwriter);
+
 				String primeiro = ret.get(0);
 				String ultimo = ret.get(1);
 				if(i==0) {
-					anterior=ultimo;
+					anterior.clear();
+					anterior.add(ultimo);
 					res.add(primeiro);
 				}
 				else if (i==children.length-1){
 					res.add(ultimo);
-					dwriter.write(anterior + " -> " + primeiro);
+					for(String ant : anterior)
+						dwriter.write(ant + " -> " + primeiro);
 				}
 				else {
-					dwriter.write(anterior + " -> " + primeiro);
-					anterior=ultimo;
-				}
-			}
-			else if(id == Ebnf.JJTREPETITION ){
-				ArrayList<String> ret = n.dotRepetition(dwriter);
-				String primeiro = ret.get(0);
-				String ultimo = ret.get(1);
-				if(i==0) {
-					anterior=ultimo;
-					res.add(primeiro);
-				}
-				else if (i==children.length-1){
-					res.add(ultimo);
-					dwriter.write(anterior + " -> " + primeiro);
-				}
-				else {
-					dwriter.write(anterior + " -> " + primeiro);
-					anterior=ultimo;
+					for(String ant : anterior)
+						dwriter.write(ant + " -> " + primeiro);
+					anterior.clear();
+					anterior.add(ultimo);
 				}
 			}
 			else if (id == Ebnf.JJTGROUPING){
 				ArrayList<String> ret = n.dotGrouping(dwriter);
-				
+				//qual o tamanho do array?!
 			}
 			else if (id == Ebnf.JJTEXCEPT) {
 				String ret = n.dotExcept();
-				dwriter.write(anterior + " -> " + ret);
-				anterior = ret;
+				for(String ant : anterior)
+					dwriter.write(ant + " -> " + ret);
+				anterior.clear();
+				anterior.add(ret);
 			}
-
-
+			else if(id == Ebnf.JJTUNION) {
+				ArrayList<String> ret = n.dotGrouping(dwriter);
+				int nr_elementos = ret.size();
+				for(int j=0; j<nr_elementos;j++) {
+					for(String ant : anterior)
+						dwriter.write(ant + " -> " + ret.get(j));
+				}
+			}
 		}
 		return res;
 	}
