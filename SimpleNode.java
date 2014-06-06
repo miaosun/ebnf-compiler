@@ -177,7 +177,23 @@ class SimpleNode implements Node {
       if(this.id == EbnfTreeConstants.JJTRULE)
         ruleNodes.add((SimpleNode) this.children[0]);
       else if(this.id == EbnfTreeConstants.JJTEXCEPT)
+      {
+
         exceptionNodes.add(this);
+        String str = ((SimpleNode) this.jjtGetChild(0)).jjtGetValue()+"_except_"+exceptionNodes.size();
+        String tok = "TODO: Redefine token to your needs";
+        //str = str.replace(" ","_");
+        //str = str.substring(2, str.length()-2);
+        mapTokensJavaCC.put(tok ,str);
+      }
+      else if(this.id == EbnfTreeConstants.JJTSPECIALSEQ)
+      {
+        Node parent = this.jjtGetParent();
+        Node child = parent.jjtGetChild(0);
+        String str = ""+((SimpleNode) child).jjtGetValue();
+        String tok = ""+this.jjtGetValue();
+        mapTokensJavaCC.put(tok ,str);
+      }
 
       if(children != null)
       {
@@ -208,13 +224,15 @@ class SimpleNode implements Node {
   {
     SimpleNode child1;
     SimpleNode child2;
+    String str = "";
 
     for (int i = 0; i < exceptionNodes.size() ; i++) {
         SimpleNode n = exceptionNodes.get(i);
         if (n != null) {
-          writer.write("void "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+"_except_"+(i+1)+"() : {} \n { ");
-          writer.write("     //TODO: redefine token on token list with "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+" except "+((SimpleNode) n.jjtGetChild(1)).jjtGetValue()+"\n");
-          writer.write("     // <insert_token_name_here> and after insert the token and its definition on the token list up!\n }");
+          writer.write(" void "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+"_except_"+(i+1)+"() : {} \n { ");
+          str = ((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+"_except_"+(i+1);
+          writer.write(" <"+str+">\n");
+          writer.write("     //TODO: redefine token on token list with "+((SimpleNode) n.jjtGetChild(0)).jjtGetValue()+" except "+((SimpleNode) n.jjtGetChild(1)).jjtGetValue()+"\n } ");
         }
       }
   }
@@ -313,26 +331,59 @@ class SimpleNode implements Node {
   {
       String tmp = "";
 
-      int count = 1 ;
-      if(children != null)
+      Integer count = new Integer(1) ;
+      if(children != null && children.length != 0)
       {
         for(int i = 0 ; i < children.length ; i++)
         {
             SimpleNode ni = (SimpleNode) children[i];
             if(ni.id == EbnfTreeConstants.JJTTERMINAL)
             {
+              System.out.println("E TERMINAL: "+ni+" ::: Count="+count);
               if(count > 1)
                 tmp+=", t"+count;
               else
                 tmp+="Token t"+count;
 
-              count++;
+              count = Integer.valueOf(count.intValue()+1);
+            }
+            else
+            {
+                System.out.println("NAO E TERMINAL: "+ni+" ::: Count="+count);
+               tmp+= ni.getNumberTokensAux(count);
             }
         }
         tmp+=";";
         return tmp;
       }
       return "";     
+  }
+  public String getNumberTokensAux(Integer count)
+  {
+    String tmp = "";
+    if(children != null  && children.length != 0)
+    {
+        for(int i = 0 ; i < children.length ; i++)
+        {
+            SimpleNode ni = (SimpleNode) children[i];
+            if(ni.id == EbnfTreeConstants.JJTTERMINAL)
+            {
+              System.out.println("2E TERMINAL: "+ni+" ::: Count="+count);
+              if(count > 1)
+                tmp+=", t"+count;
+              else
+                tmp+="Token t"+count;
+
+              count = Integer.valueOf(count.intValue()+1);
+            }
+            else
+            {
+                System.out.println("2NAO E TERMINAL: "+ni+" ::: Count="+count);
+              tmp+= ni.getNumberTokensAux(count);
+            }
+          }
+    }
+    return tmp;
   }
 
   public void printUnion(Writer writer) throws IOException {
@@ -434,10 +485,17 @@ class SimpleNode implements Node {
         printOptional(writer);
         break;
       case EbnfTreeConstants.JJTSPECIALSEQ :
-        String str = ""+this.jjtGetValue();
+        Node parent = this.jjtGetParent();
+        Node child = parent.jjtGetChild(0);
+        String str = ""+((SimpleNode) child).jjtGetValue();
+        if(mapTokensJavaCC.containsValue(str))
+          writer.write(" <"+str+">");
+        /*String tok = ""+this.jjtGetValue();
+        mapTokensJavaCC.put(tok ,str);
+        String str = ""+this.jjtGetValue(); 
         str = str.replace("?","\"");
         str = str.replace(" ","_");
-        writer.write(str);
+        writer.write(str);*/
         break;
       default :   
         System.out.println("Não processado: "+EbnfTreeConstants.jjtNodeName[this.id]);
