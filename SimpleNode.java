@@ -705,11 +705,24 @@ class SimpleNode implements Node {
 			return printOption(inNodes, dwriter);
 		case Ebnf.JJTEXCEPT:
 			return PrintExcept(inNodes, dwriter);
+		case Ebnf.JJTSPECIALSEQ:
+			return PrintSpecialSequence(inNodes, dwriter);
+			
 			
 		}
 		System.out.println("RETURNING NULL "+id);
 		return null;
 
+	}
+
+	private ArrayList<String> PrintSpecialSequence(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		String value = addLabel(""+jjtGetValue());
+		for(String n :inNodes) {
+			dwriter.write(n + " -> " + value+";\n");
+		}
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(value);
+		return res;
 	}
 
 	private ArrayList<String> PrintExcept(ArrayList<String> inNodes, Writer dwriter) throws IOException {
