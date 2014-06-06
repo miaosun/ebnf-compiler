@@ -641,7 +641,7 @@ class SimpleNode implements Node {
 			((SimpleNode) rule.jjtGetChild(1)).printRuleDotty(dwriter);
 			
 			printLabelsDotty(dwriter);
-			dwriter.write("}");
+			dwriter.write("}\n\n");
 		}
 	}
 
@@ -675,7 +675,7 @@ class SimpleNode implements Node {
 		 */
 		for(String ret : returns)
 		{
-			dwriter.write(ret + " -> " + endNode);
+			dwriter.write(ret + " -> " + endNode+";\n");
 		}
 
 
