@@ -45,9 +45,9 @@ class SimpleNode implements Node {
 		String node = getNextLabel();
 		if(value.startsWith("\"") || value.startsWith("\'"))
 			value = value.substring(1, value.length()-1);
-		
+
 		value = value.replace("\"", "\\\"").replace("\'", "\\\'");	
-			
+
 		labels.put(node, value);
 		return node;
 	}
@@ -384,7 +384,7 @@ class SimpleNode implements Node {
 
 		dwriter.write("digraph EBNF {\n");
 		System.out.println("\n\nCreating Dotty file.");
-		for(int i=0; i<children.length-1; i++)
+		for(int i=0; i<children.length; i++)
 		{
 			resetLabelsMap();
 			SimpleNode rule = (SimpleNode)children[i];
@@ -465,14 +465,23 @@ class SimpleNode implements Node {
 		String value = addLabel( ((SimpleNode)children[0]).jjtGetValue() + " - " + ((SimpleNode)children[1]).jjtGetValue() );
 		for(String n :inNodes) {
 			dwriter.write(n + " -> " + value+";\n");
+			
 		}
+			
+		SimpleNode parent = (SimpleNode) this.jjtGetParent();
+		if(parent.jjtGetID() == Ebnf.JJTREPETITION) {
+			dwriter.write(value + " -> " + value+";\n");
+		}
+		
 		ArrayList<String> res = new ArrayList<String>();
 		res.add(value);
+		
 		return res;
 	}
 
 	private ArrayList<String> printUnion(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> temp = new ArrayList<String>();
 
 		for(int i=0; i<children.length;i++) {
 			res.addAll(((SimpleNode) children[i]).printNodeDotty(inNodes, dwriter));
@@ -507,10 +516,10 @@ class SimpleNode implements Node {
 
 	private ArrayList<String> printConcat(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 		ArrayList<String> in = new ArrayList<String>();
-		in.addAll(inNodes);
 
 		SimpleNode parent = (SimpleNode) this.jjtGetParent();
 		if(parent.jjtGetID() != Ebnf.JJTREPETITION) {
+			in.addAll(inNodes);
 			for(int i=0; i<children.length;i++) {
 				in = ((SimpleNode) children[i]).printNodeDotty(in, dwriter);
 			}
@@ -519,23 +528,19 @@ class SimpleNode implements Node {
 		else
 		{
 			ArrayList<String> temp = new ArrayList<String>();
-			temp = ((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter);
+			temp.addAll( ((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter) );
 			in = temp;
 			for(int i=1; i<children.length;i++) {
 				in = ((SimpleNode) children[i]).printNodeDotty(in, dwriter);
 			}
+			
+			//ligar ultimos aos primeiros
+			for(String ultimo : in)
+				for(String primeiro : temp)
+					dwriter.write(ultimo + " -> " + primeiro + ";\n");
+
 			return in;
 		}
-
-/*
-		//SimpleNode parent = (SimpleNode) this.jjtGetParent();
-		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
-		{
-			((SimpleNode) children[0]).printNodeDotty(in, dwriter);
-		}
-
-		return in;
-		*/
 	}
 
 	private ArrayList<String> printOption(ArrayList<String> inNodes, Writer dwriter) throws IOException {
