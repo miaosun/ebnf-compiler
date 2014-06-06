@@ -257,7 +257,20 @@ class SimpleNode implements Node {
   public void generateParser(Writer writer, String name) throws IOException {
     writer.write("PARSER_BEGIN("+name+")\n");
     writer.write("class "+name+" { \n public static void main(String args[]) throws ParseException { \n ");
-    writer.write(name+" parser = new "+name+"(System.in);\n");
+    
+    writer.write(name+" parser;\n");
+
+    writer.write("if(args.length == 0){\n");
+    writer.write("System.out.println (\"Parser: Reading input ...\");\n");
+    writer.write("parser = new "+name+"(System.in);\n}");
+    
+    writer.write("\nelse if(args.length == 1){\n");
+    writer.write("System.out.println (\"Parser: Reading the file \"+ args[0] + \" ...\");\n");
+    writer.write("try{ parser = new "+name+"(new java.io.FileInputStream(args[0])); }\n");
+    writer.write("catch(java.io.FileNotFoundException e){\n System.out.println(\"Parser: The file \"+args[0]+\" was not found.\");\n return ; \n} \n");
+
+    writer.write("}\n else {\n System.out.println(\"Parser:  You must use one of the following:\");\n System.out.println(\"         java "+name+"\");\n System.out.println(\" or \");\n System.out.println(\"         java "+name+" <filename>\");\n return; \n}\n");
+
     writer.write("SimpleNode root =parser.");
     writer.write(((SimpleNode) ruleNodes.get(0)).jjtGetValue()+"(); \n ");
     writer.write("root.dump(\"\"); \n } \n }\n");
@@ -266,6 +279,7 @@ class SimpleNode implements Node {
     writer.write("TOKEN : \n{\n "+getTokens()+"\n}\n");
     startPrints(writer);
     printExtraRules(writer);
+
   }
 
   public String getTokens()
@@ -317,14 +331,33 @@ class SimpleNode implements Node {
       System.out.println("ERROR");
       System.exit(1);
     }
+
+    
+
+   // if(this.jjtGetVa(SimpleNode) ruleNodes.get(0)).jjtGetValue()+"(); \n ");
+
     SimpleNode n0 = (SimpleNode) children[0];
     SimpleNode n = (SimpleNode)children[1];
+
+
     String insertTokens=n.getNumberTokens();
-     cardinalToken = 1; // reset cardinalToken because getNumberToken use it;
-    writer.write("void "+n0.jjtGetValue()+"() #"+n0.jjtGetValue()+" : {"+insertTokens+"} \n { ");
+    cardinalToken = 1; // reset cardinalToken because getNumberToken use it;
+
+    if((""+n0.jjtGetValue()).equals(""+((SimpleNode) ruleNodes.get(0)).jjtGetValue()))
+        writer.write("SimpleNode "+n0.jjtGetValue()+"() #"+n0.jjtGetValue()+" : {"+insertTokens+"} \n { ");
+    else
+        writer.write("void "+n0.jjtGetValue()+"() #"+n0.jjtGetValue()+" : {"+insertTokens+"} \n { ");
+
+    
     
     n.printNode(writer);
-    writer.write(" }");
+
+    if((""+n0.jjtGetValue()).equals(""+((SimpleNode) ruleNodes.get(0)).jjtGetValue()))
+        writer.write("{return jjtThis;}\n }");
+    else
+        writer.write(" }");
+
+    
   }
 
   public String getNumberTokens()

@@ -52,11 +52,16 @@ public class Ebnf {
 			return ;
 		}
 		try {
-			String name = ""+args[0];
+			String name;
+			if(args.length > 0)
+				name = ""+args[0];
+			else
+				name = "FicheiroGerado.txt";
 			name = name.replace(".txt",".jjt");
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./Testes/JavaCC"+name), "utf-8"));
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
+			writer.close();
 			//SimpleNode.dumpIds();
 			//SimpleNode.dumpTokens();
 			if(!root.verifyIdentifiers())
