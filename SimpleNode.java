@@ -742,6 +742,15 @@ class SimpleNode implements Node {
 		for(int i=0; i<children.length;i++) {
 			res.addAll(((SimpleNode) children[i]).printNodeDotty(inNodes, dwriter));
 		}
+		
+		SimpleNode parent = (SimpleNode) this.jjtGetParent();
+		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
+		{
+			for(String inNode : inNodes)
+				for(String r : res)
+					dwriter.write(r + " -> " + inNode + ";\n");
+		}
+		
 		//res.add(""+((SimpleNode)children[i]).jjtGetValue());
 		/*
 		for(String n : inNodes) {
@@ -771,10 +780,8 @@ class SimpleNode implements Node {
 		//for(int i=0; i<children.length;i++) {
 		
 		
-		//assumindo que o node repetition tem sempre só um filho
+		//assumindo que o node repetition tem sempre so um filho
 		res = ((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter);
-		
-		((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter);
 		
 		/*
 		for(String r : res) {
@@ -814,6 +821,14 @@ class SimpleNode implements Node {
 		for(int i=0; i<children.length;i++) {
 			in = ((SimpleNode) children[i]).printNodeDotty(in, dwriter);
 		}
+		
+		SimpleNode parent = (SimpleNode) this.jjtGetParent();
+		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
+		{
+			for(String inNode : inNodes)
+				for(String i : in)
+					dwriter.write(i + " -> " + inNode + ";\n");
+		}
 
 		/*
 		if(children.length >= 2)
@@ -831,7 +846,7 @@ class SimpleNode implements Node {
 		ArrayList<String> res = new ArrayList<String>();
 		res.addAll(inNodes);
 
-		//assumindo que o node option tem sempre só um filho
+		//assumindo que o node option tem sempre so um filho
 		res.addAll(((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter));
 
 		return res;
@@ -847,6 +862,15 @@ class SimpleNode implements Node {
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + value + ";\n");
 		}
+		
+		SimpleNode parent = (SimpleNode) this.jjtGetParent();
+		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
+		{
+			for(String inNode : inNodes)
+				for(String r : res)
+					dwriter.write(r + " -> " + inNode + ";\n");
+		}
+		
 		return res;
 	}
 
