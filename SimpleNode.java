@@ -35,9 +35,10 @@ class SimpleNode implements Node {
 	private static String getNextLabel() {
 		return "n"+labelsCounter++;
 	}
+	/*
 	private static void resetLabelsMap() {
 		labels.clear();
-	}
+	}*/
 	private static String addLabel(String value) {
 		String node = getNextLabel();
 		labels.put(node, value);
@@ -360,11 +361,11 @@ class SimpleNode implements Node {
 		}
 
 	}
-
+	/*
 	public ArrayList<String> generateDotty(Writer dwriter) throws IOException {
 
 		if(this.id == EbnfTreeConstants.JJTRULE) {
-			resetLabelsMap();
+			//resetLabelsMap();
 			SimpleNode start = new SimpleNode(-1);
 			for (int i = 0; i < children.length; ++i) {
 				SimpleNode n = (SimpleNode)children[i];
@@ -614,9 +615,18 @@ class SimpleNode implements Node {
 		}
 		return res;
 	}
+	 */
+	
+	private void printLabelsDotty(Writer dwriter) throws IOException {
+		Iterator it = labels.entrySet().iterator();
+		while(it.hasNext())
+		{
+			Map.Entry pairs = (Map.Entry)it.next();
+			dwriter.write(pairs.getKey()+" [label="+pairs.getValue()+"];\n");
+		}
+	}
 
-
-	public void printRuesDotty(Writer dwriter) throws IOException {
+	public void printRulesDotty(Writer dwriter) throws IOException {
 
 		for(int i=0; i<children.length-1; i++)
 		{
@@ -624,6 +634,9 @@ class SimpleNode implements Node {
 			dwriter.write("digraph " + rule.children[0] + " {\n");
 
 			printRuleDotty((SimpleNode)rule.children[1], dwriter);
+			
+			printLabelsDotty(dwriter);
+			dwriter.write("}");
 		}
 	}
 
@@ -631,14 +644,14 @@ class SimpleNode implements Node {
 	public void printRuleDotty(SimpleNode ruleContent, Writer dwriter) throws IOException {
 
 		ArrayList<String> inNodes = new ArrayList<String>();
-		String initialNode = "Start";
+		String initialNode = addLabel("Start");
 		inNodes.add(initialNode);
 
-		String endNode = "End";
+		String endNode = addLabel("End");
 
 		ArrayList<String> returns = new ArrayList<String>();
 
-		returns = printNode(inNodes, dwriter);
+		returns = printNodeDotty(inNodes, dwriter);
 		/*
 		int ruleContentID = ruleContent.jjtGetID();
 
@@ -667,7 +680,7 @@ class SimpleNode implements Node {
 	}
 
 
-	public ArrayList<String> printNode(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+	public ArrayList<String> printNodeDotty(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 
 		switch(id) {
 		case Ebnf.JJTTERMINAL:
@@ -693,7 +706,7 @@ class SimpleNode implements Node {
 		ArrayList<String> res = new ArrayList<String>();
 
 		for(int i=0; i<children.length;i++) {
-			res.addAll(((SimpleNode) children[i]).printNode(inNodes, dwriter));
+			res.addAll(((SimpleNode) children[i]).printNodeDotty(inNodes, dwriter));
 		}
 		//res.add(""+((SimpleNode)children[i]).jjtGetValue());
 		/*
@@ -706,12 +719,12 @@ class SimpleNode implements Node {
 		 */
 		return res;
 	}
-	
+
 	private ArrayList<String> printGrouping(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
 
-		res.addAll(((SimpleNode) children[0]).printNode(inNodes, dwriter));
-		
+		res.addAll(((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter));
+
 		return res;
 	}
 
@@ -722,9 +735,9 @@ class SimpleNode implements Node {
 		ArrayList<String> res = inNodes;
 
 		//for(int i=0; i<children.length;i++) {
-		
+
 		//assumindo que o node repetition tem sempre só um filho
-		res = ((SimpleNode) children[0]).printNode(inNodes, dwriter);
+		res = ((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter);
 		for(String r : res) {
 			for(String inNode : inNodes)
 				dwriter.write(r + " -> " + inNode + ";\n");
@@ -758,7 +771,7 @@ class SimpleNode implements Node {
 			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
 		}*/
 		for(int i=0; i<children.length;i++) {
-			in = ((SimpleNode) children[i]).printNode(in, dwriter);
+			in = ((SimpleNode) children[i]).printNodeDotty(in, dwriter);
 		}
 
 		/*
@@ -778,7 +791,7 @@ class SimpleNode implements Node {
 		res.addAll(inNodes);
 
 		//assumindo que o node option tem sempre só um filho
-		res.addAll(((SimpleNode) children[0]).printNode(inNodes, dwriter));
+		res.addAll(((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter));
 
 		return res;
 	}
@@ -786,7 +799,7 @@ class SimpleNode implements Node {
 
 	private ArrayList<String> printTerminal(ArrayList<String> inNodes, Writer dwriter) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
-		String value = ""+jjtGetValue();
+		String value = addLabel(""+jjtGetValue());
 		res.add(value);
 
 		for(String n : inNodes) {
@@ -794,16 +807,6 @@ class SimpleNode implements Node {
 		}
 		return res;
 	}
-
-
-	/*
-public ArrayList<String> dotUnion() {
-
-
-	return null;
-}
-	 */
-
 
 
 }

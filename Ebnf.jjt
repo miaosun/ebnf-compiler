@@ -61,7 +61,7 @@ public class Ebnf {
 			dottyWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Dotty"+namedot), "utf-8"));
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
-			root.generateDotty(dottyWriter);
+			root.jjtGetChild(0).generateDotty(dottyWriter);
 			//SimpleNode.dumpIds();
 			//SimpleNode.dumpTokens();
 			if(!root.verifyIdentifiers())
@@ -85,7 +85,7 @@ public class Ebnf {
 			System.out.println (e.getMessage());
 		}
 		finally{
-			try {writer.close();} catch (Exception e) {}
+			try {writer.close(); dwriter.close();} catch (Exception e) {}
 		}
 
 	}
