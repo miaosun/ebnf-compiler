@@ -624,7 +624,8 @@ class SimpleNode implements Node {
 		while(it.hasNext())
 		{
 			Map.Entry pairs = (Map.Entry)it.next();
-			dwriter.write(pairs.getKey()+" [label="+pairs.getValue()+"];\n");
+			String value = ((String)pairs.getValue()).replace("\'", "").replace("\"", "");
+			dwriter.write(pairs.getKey()+" [label=\""+value+"\"];\n");
 		}
 	}
 
