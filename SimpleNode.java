@@ -706,10 +706,13 @@ class SimpleNode implements Node {
 		 */
 		return res;
 	}
-	private ArrayList<String> printGrouping(ArrayList<String> inNodes, Writer dwriter) {
+	
+	private ArrayList<String> printGrouping(ArrayList<String> inNodes, Writer dwriter) throws IOException {
+		ArrayList<String> res = new ArrayList<String>();
 
-
-		return null;
+		res.addAll(((SimpleNode) children[0]).printNode(inNodes, dwriter));
+		
+		return res;
 	}
 
 	private ArrayList<String> printRepetition(ArrayList<String> inNodes, Writer dwriter) throws IOException {
@@ -719,6 +722,8 @@ class SimpleNode implements Node {
 		ArrayList<String> res = inNodes;
 
 		//for(int i=0; i<children.length;i++) {
+		
+		//assumindo que o node repetition tem sempre só um filho
 		res = ((SimpleNode) children[0]).printNode(inNodes, dwriter);
 		for(String r : res) {
 			for(String inNode : inNodes)
