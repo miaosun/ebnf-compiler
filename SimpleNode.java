@@ -745,9 +745,8 @@ class SimpleNode implements Node {
 		SimpleNode parent = (SimpleNode) this.jjtGetParent();
 		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
 		{
-			for(String inNode : inNodes)
-				for(String r : res)
-					dwriter.write(r + " -> " + inNode + ";\n");
+			for(int i=0; i<children.length;i++)
+				((SimpleNode) children[i]).printNodeDotty(res, dwriter);
 		}
 		
 		//res.add(""+((SimpleNode)children[i]).jjtGetValue());
@@ -824,9 +823,7 @@ class SimpleNode implements Node {
 		SimpleNode parent = (SimpleNode) this.jjtGetParent();
 		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
 		{
-			for(String inNode : inNodes)
-				for(String i : in)
-					dwriter.write(i + " -> " + inNode + ";\n");
+			((SimpleNode) children[0]).printNodeDotty(in, dwriter);
 		}
 
 		/*
@@ -865,9 +862,7 @@ class SimpleNode implements Node {
 		SimpleNode parent = (SimpleNode) this.jjtGetParent();
 		if(parent.jjtGetID() == Ebnf.JJTREPETITION)
 		{
-			for(String inNode : inNodes)
-				for(String r : res)
-					dwriter.write(r + " -> " + inNode + ";\n");
+			dwriter.write(value + " -> " + value + ";\n");
 		}
 		
 		return res;
