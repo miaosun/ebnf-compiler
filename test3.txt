@@ -1,5 +1,5 @@
 (* EBNF Grammar for Mini-Java *)
-Goal = MainClass, { ClassDeclaration }, EOF;
+Goal = MainClass, { ClassDeclaration };
 MainClass = "class", Identifier, "{", "public", "static", "void", "main", "(", "String", "[", "]", Identifier, ")", "{", Statement, "}", "}";
 ClassDeclaration = "class", Identifier, [ "extends", Identifier ], "{", { VarDeclaration }, { MethodDeclaration }, "}";
 VarDeclaration = Type, Identifier, ";";
