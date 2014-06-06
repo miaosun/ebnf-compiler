@@ -35,10 +35,10 @@ class SimpleNode implements Node {
 	private static String getNextLabel() {
 		return "n"+labelsCounter++;
 	}
-	/*
+	
 	private static void resetLabelsMap() {
 		labels.clear();
-	}*/
+	}
 	private static String addLabel(String value) {
 		String node = getNextLabel();
 		labels.put(node, value);
@@ -630,10 +630,15 @@ class SimpleNode implements Node {
 
 		for(int i=0; i<children.length-1; i++)
 		{
+			resetLabelsMap();
 			SimpleNode rule = (SimpleNode)children[i];
-			dwriter.write("digraph " + rule.children[0] + " {\n");
+			
+			String name = (String) ((SimpleNode)rule.jjtGetChild(0)).jjtGetValue();
+			System.out.println("TESTE: "+name);
+			dwriter.write("digraph " + name + " {\n");
+			dwriter.write("label = \"" + name + "\";\n");
 
-			printRuleDotty((SimpleNode)rule.children[1], dwriter);
+			((SimpleNode) rule.jjtGetChild(1)).printRuleDotty(dwriter);
 			
 			printLabelsDotty(dwriter);
 			dwriter.write("}");
@@ -641,7 +646,7 @@ class SimpleNode implements Node {
 	}
 
 
-	public void printRuleDotty(SimpleNode ruleContent, Writer dwriter) throws IOException {
+	public void printRuleDotty(Writer dwriter) throws IOException {
 
 		ArrayList<String> inNodes = new ArrayList<String>();
 		String initialNode = addLabel("Start");
@@ -732,7 +737,8 @@ class SimpleNode implements Node {
 		//		ArrayList<String> res = new ArrayList<String>();
 		//		res.add(""+((SimpleNode)children[children.length-1]).jjtGetValue());
 
-		ArrayList<String> res = inNodes;
+		ArrayList<String> res = new ArrayList<String>();
+		res.addAll(inNodes);
 
 		//for(int i=0; i<children.length;i++) {
 
@@ -765,7 +771,8 @@ class SimpleNode implements Node {
 		//		ArrayList<String> res = new ArrayList<String>();
 		//		res.add(""+((SimpleNode)children[children.length-1]).jjtGetValue());
 
-		ArrayList<String> in = inNodes;
+		ArrayList<String> in = new ArrayList<String>();
+		in.addAll(inNodes);
 		/*
 		for(String n : inNodes) {
 			dwriter.write(n + " -> " + ((SimpleNode)children[0]).jjtGetValue() + ";\n");
