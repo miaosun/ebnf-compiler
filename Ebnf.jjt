@@ -25,6 +25,7 @@ public class Ebnf {
 		// Iniciando parser
 		Ebnf parser;
 		Writer writer = null;
+		Writer dottyWriter = null;
 		patternQuotes = Pattern.compile("^\'(.*?)\'$");
 		patternQuotationMarks = Pattern.compile("^\"(.*?)\"$");
 
@@ -53,10 +54,14 @@ public class Ebnf {
 		}
 		try {
 			String name = ""+args[0];
+			String namedot = name.replace(".txt",".dot");
 			name = name.replace(".txt",".jj");
+			
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("JavaCC"+name), "utf-8"));
+			dottyWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Dotty"+namedot), "utf-8"));
 			SimpleNode root = parser.Start();
 			root.dump("",writer,parser.getClass().getName());
+			root.printRulesDotty(dottyWriter);
 			//SimpleNode.dumpIds();
 			//SimpleNode.dumpTokens();
 			if(!root.verifyIdentifiers())
@@ -80,7 +85,7 @@ public class Ebnf {
 			System.out.println (e.getMessage());
 		}
 		finally{
-			try {writer.close();} catch (Exception e) {}
+			try {writer.close(); dottyWriter.close();} catch (Exception e) {}
 		}
 
 	}
