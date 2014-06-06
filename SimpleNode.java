@@ -628,7 +628,7 @@ class SimpleNode implements Node {
 			dwriter.write(pairs.getKey()+" [label=\""+value+"\"];\n");
 		}
 	}
-
+/*
 	public void printRulesDotty(Writer dwriter) throws IOException {
 
 		for(int i=0; i<children.length-1; i++)
@@ -647,8 +647,31 @@ class SimpleNode implements Node {
 			dwriter.write("}\n\n");
 		}
 	}
+*/
 
+	public void printRulesDotty(Writer dwriter) throws IOException {
 
+		dwriter.write("digraph EBNF {\n");
+		
+		for(int i=0; i<children.length-1; i++)
+		{
+			resetLabelsMap();
+			SimpleNode rule = (SimpleNode)children[i];
+			
+			String name = (String) ((SimpleNode)rule.jjtGetChild(0)).jjtGetValue();
+			System.out.println("TESTE: "+name);
+			dwriter.write("subgraph " + name + " {\n");
+			dwriter.write("label = \"" + name + "\";\n");
+
+			((SimpleNode) rule.jjtGetChild(1)).printRuleDotty(dwriter);
+			
+			printLabelsDotty(dwriter);
+			dwriter.write("}\n\n");
+		}
+		
+		dwriter.write("}\n");
+	}
+	
 	public void printRuleDotty(Writer dwriter) throws IOException {
 
 		ArrayList<String> inNodes = new ArrayList<String>();
