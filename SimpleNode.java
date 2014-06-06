@@ -779,7 +779,7 @@ class SimpleNode implements Node {
 		//for(int i=0; i<children.length;i++) {
 		
 		
-		//assumindo que o node repetition tem sempre s� um filho
+		//assumindo que o node repetition tem sempre so um filho
 		res = ((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter);
 		
 		/*
@@ -845,7 +845,7 @@ class SimpleNode implements Node {
 		ArrayList<String> res = new ArrayList<String>();
 		res.addAll(inNodes);
 
-		//assumindo que o node option tem sempre s� um filho
+		//assumindo que o node option tem sempre so um filho
 		res.addAll(((SimpleNode) children[0]).printNodeDotty(inNodes, dwriter));
 
 		return res;
