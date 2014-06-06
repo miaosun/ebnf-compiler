@@ -317,10 +317,10 @@ class SimpleNode implements Node {
       System.out.println("ERROR");
       System.exit(1);
     }
-    cardinalToken =1;
     SimpleNode n0 = (SimpleNode) children[0];
     SimpleNode n = (SimpleNode)children[1];
     String insertTokens=n.getNumberTokens();
+     cardinalToken = 1; // reset cardinalToken because getNumberToken use it;
     writer.write("void "+n0.jjtGetValue()+"() #"+n0.jjtGetValue()+" : {"+insertTokens+"} \n { ");
     
     n.printNode(writer);
@@ -330,8 +330,8 @@ class SimpleNode implements Node {
   public String getNumberTokens()
   {
       String tmp = "";
+      cardinalToken = 1;
 
-      Integer count = new Integer(1) ;
       if(children != null && children.length != 0)
       {
         for(int i = 0 ; i < children.length ; i++)
@@ -339,18 +339,16 @@ class SimpleNode implements Node {
             SimpleNode ni = (SimpleNode) children[i];
             if(ni.id == EbnfTreeConstants.JJTTERMINAL)
             {
-              System.out.println("E TERMINAL: "+ni+" ::: Count="+count);
-              if(count > 1)
-                tmp+=", t"+count;
+              if(cardinalToken > 1)
+                tmp+=", t"+cardinalToken;
               else
-                tmp+="Token t"+count;
+                tmp+="Token t"+cardinalToken;
 
-              count = Integer.valueOf(count.intValue()+1);
+              cardinalToken +=1;
             }
             else
             {
-                System.out.println("NAO E TERMINAL: "+ni+" ::: Count="+count);
-               tmp+= ni.getNumberTokensAux(count);
+               tmp+= ni.getNumberTokensAux();
             }
         }
         tmp+=";";
@@ -358,7 +356,7 @@ class SimpleNode implements Node {
       }
       return "";     
   }
-  public String getNumberTokensAux(Integer count)
+  public String getNumberTokensAux()
   {
     String tmp = "";
     if(children != null  && children.length != 0)
@@ -368,18 +366,16 @@ class SimpleNode implements Node {
             SimpleNode ni = (SimpleNode) children[i];
             if(ni.id == EbnfTreeConstants.JJTTERMINAL)
             {
-              System.out.println("2E TERMINAL: "+ni+" ::: Count="+count);
-              if(count > 1)
-                tmp+=", t"+count;
+              if(cardinalToken > 1)
+                tmp+=", t"+cardinalToken;
               else
-                tmp+="Token t"+count;
+                tmp+="Token t"+cardinalToken;
 
-              count = Integer.valueOf(count.intValue()+1);
+              cardinalToken+=1;
             }
             else
             {
-                System.out.println("2NAO E TERMINAL: "+ni+" ::: Count="+count);
-              tmp+= ni.getNumberTokensAux(count);
+              tmp+= ni.getNumberTokensAux();
             }
           }
     }
